@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Public client — uses Anon key. Safe for browser-side usage.
-// This client respects RLS policies.
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Public Supabase client (respects RLS). Safe to import in server components.
+// Returns null if env vars not configured — callers should handle this.
+export function getSupabaseClient() {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return null;
+    return createClient(url, key);
+}

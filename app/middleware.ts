@@ -1,31 +1,39 @@
-import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
+import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
 export async function middleware(request: NextRequest) {
-    const response = NextResponse.next({ request });
+    const pathname = request.nextUrl.pathname;
 
-    // Only protect /admin routes (except /admin/login)
-    if (
-        request.nextUrl.pathname.startsWith('/admin') &&
-        !request.nextUrl.pathname.startsWith('/admin/login')
-    ) {
-        const supabase = createServerClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-            {
-                cookies: {
-                    getAll() {
-                        return request.cookies.getAll();
-                    },
-                    setAll(cookiesToSet) {
-                        cookiesToSet.forEach(({ name, value, options }) =>
-                            response.cookies.set(name, value, options)
-                        );
-                    },
+    // Only protect /admin/* routes (not /admin/login)
+    if (!pathname.startsWith('/admin') || pathname.startsWith('/admin/login')) {
+        return NextResponse.next();
+    }
+
+    // If Supabase isn't configured yet, redirect /admin to /admin/login gracefully
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseAnonKey) {
+        const loginUrl = new URL('/admin/login', request.url);
+        return NextResponse.redirect(loginUrl);
+    }
+
+    // Supabase is configured — check session
+    const response = NextResponse.next();
+
+    try {
+        const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+            cookies: {
+                getAll() {
+                    return request.cookies.getAll();
                 },
-            }
-        );
+                setAll(cookiesToSet) {
+                    cookiesToSet.forEach(({ name, value, options }) => {
+                        response.cookies.set(name, value, options);
+                    });
+                },
+            },
+        });
 
         const {
             data: { user },
@@ -35,6 +43,10 @@ export async function middleware(request: NextRequest) {
             const loginUrl = new URL('/admin/login', request.url);
             return NextResponse.redirect(loginUrl);
         }
+    } catch {
+        // If anything goes wrong with auth check, redirect to login (safe default)
+        const loginUrl = new URL('/admin/login', request.url);
+        return NextResponse.redirect(loginUrl);
     }
 
     return response;

@@ -12,6 +12,14 @@ export type SubmitResult =
     | { success: false; error: string };
 
 export async function submitApplication(formData: FormData): Promise<SubmitResult> {
+    // Guard: if Supabase not configured, return friendly message
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        return {
+            success: false,
+            error: 'Applications are not yet open. Please check back soon or call us at (313) 255-7827.',
+        };
+    }
+
     // 1. Get client IP for rate limiting
     const headersList = await headers();
     const ip =

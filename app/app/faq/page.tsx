@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-    title: 'FAQ — TruckCo Careers',
-    description: 'Frequently asked questions about applying for a job at TruckCo.',
+    title: 'FAQ — N&Z Logistics LLC Careers',
+    description: 'Frequently asked questions about applying for a job at N&Z Logistics LLC.',
 };
 
 const faqs = [
@@ -47,8 +47,8 @@ export default function FAQPage() {
                 <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
                     Frequently Asked <span className="text-orange-400">Questions</span>
                 </h1>
-                <p className="text-slate-400 text-lg max-w-xl mx-auto">
-                    Everything you need to know about applying for a position at TruckCo.
+                <p className="text-[var(--color-muted)] text-lg max-w-xl mx-auto">
+                    Everything you need to know about applying for a position at N&Z Logistics LLC.
                 </p>
             </div>
 
@@ -58,13 +58,13 @@ export default function FAQPage() {
                         key={i}
                         className="card group open:border-orange-500/40 transition-all duration-200 cursor-pointer"
                     >
-                        <summary className="flex items-center justify-between font-semibold text-white list-none py-1 select-none">
+                        <summary className="flex items-center justify-between font-semibold text-[var(--color-text)] list-none py-1 select-none">
                             <span>{faq.q}</span>
-                            <span className="ml-4 shrink-0 w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-orange-400 text-sm transition-transform group-open:rotate-45">
+                            <span className="ml-4 shrink-0 w-6 h-6 rounded-full bg-[var(--color-surface2)] flex items-center justify-center text-orange-400 text-sm transition-transform group-open:rotate-45">
                                 +
                             </span>
                         </summary>
-                        <p className="text-slate-400 leading-relaxed mt-3 pt-3 border-t border-slate-700/60 text-sm">
+                        <p className="text-[var(--color-muted)] leading-relaxed mt-3 pt-3 border-t border-[var(--color-border)] text-sm">
                             {faq.a}
                         </p>
                     </details>
@@ -73,8 +73,8 @@ export default function FAQPage() {
 
             {/* CTA */}
             <div className="mt-12 card text-center bg-gradient-to-br from-orange-900/20 to-slate-800 border-orange-500/20">
-                <p className="text-white font-semibold mb-2">Still have questions?</p>
-                <p className="text-slate-400 text-sm mb-5">Our team is happy to help via email or phone.</p>
+                <p className="text-[var(--color-text)] font-semibold mb-2">Still have questions?</p>
+                <p className="text-[var(--color-muted)] text-sm mb-5">Our team is happy to help via email or phone.</p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <a href="/contact" className="btn-secondary text-sm">
                         Contact Us

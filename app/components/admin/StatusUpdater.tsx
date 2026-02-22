@@ -48,8 +48,8 @@ export default function StatusUpdater({
                         onClick={() => handleUpdate(s)}
                         disabled={loading}
                         className={`badge border px-3 py-1.5 text-xs capitalize cursor-pointer transition-all disabled:opacity-60 ${status === s
-                                ? statusColors[s] + ' ring-1 ring-current scale-105'
-                                : 'bg-slate-700/50 text-slate-400 border-slate-600 hover:border-slate-400'
+                            ? statusColors[s] + ' ring-1 ring-current scale-105'
+                            : 'bg-[var(--color-surface2)] text-[var(--color-muted)] border-[var(--color-border)] hover:border-[var(--color-muted)]'
                             }`}
                     >
                         {s}

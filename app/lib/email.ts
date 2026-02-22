@@ -2,33 +2,33 @@ import { Resend } from 'resend';
 
 // Resend client — created lazily at call time (env vars only needed at runtime)
 function getResend() {
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-        throw new Error('Missing RESEND_API_KEY environment variable');
-    }
-    return new Resend(apiKey);
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('Missing RESEND_API_KEY environment variable');
+  }
+  return new Resend(apiKey);
 }
 
-const FROM_ADDRESS = process.env.EMAIL_FROM ?? 'TruckCo Careers <noreply@resend.dev>';
+const FROM_ADDRESS = process.env.EMAIL_FROM ?? 'N&Z Logistics LLC Careers <noreply@resend.dev>';
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? '';
 
 // ── Email: Applicant Confirmation ─────────────────────────────────────────────
 export async function sendApplicantConfirmationEmail({
-    to,
-    firstName,
-    position,
+  to,
+  firstName,
+  position,
 }: {
-    to: string;
-    firstName: string;
-    position: string;
+  to: string;
+  firstName: string;
+  position: string;
 }) {
-    const resend = getResend();
+  const resend = getResend();
 
-    await resend.emails.send({
-        from: FROM_ADDRESS,
-        to,
-        subject: `We received your application — TruckCo`,
-        html: `
+  await resend.emails.send({
+    from: FROM_ADDRESS,
+    to,
+    subject: `We received your application — N&Z Logistics LLC`,
+    html: `
 <!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Application Received</title></head>
@@ -36,14 +36,14 @@ export async function sendApplicantConfirmationEmail({
   <div style="max-width:560px;margin:40px auto;background:#1e293b;border-radius:16px;overflow:hidden;border:1px solid #334155;">
     <!-- Header -->
     <div style="background:#ea580c;padding:28px 32px;">
-      <p style="margin:0;color:#fff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">🚛 TruckCo Careers</p>
+      <p style="margin:0;color:#fff;font-size:22px;font-weight:700;letter-spacing:-0.5px;">🚛 N&Z Logistics LLC Careers</p>
     </div>
 
     <!-- Body -->
     <div style="padding:32px;">
       <h1 style="color:#f1f5f9;font-size:20px;margin:0 0 12px;">Hi ${firstName},</h1>
       <p style="color:#94a3b8;font-size:15px;line-height:1.7;margin:0 0 16px;">
-        Thank you for applying for the <strong style="color:#f97316;">${position}</strong> position at TruckCo.
+        Thank you for applying for the <strong style="color:#f97316;">${position}</strong> position at N&Z Logistics LLC.
         We've received your application and our team will review it shortly.
       </p>
 
@@ -64,39 +64,39 @@ export async function sendApplicantConfirmationEmail({
     <!-- Footer -->
     <div style="padding:16px 32px;border-top:1px solid #334155;">
       <p style="color:#475569;font-size:12px;margin:0;text-align:center;">
-        © 2026 TruckCo · This is an automated confirmation email.
+        © 2026 N&Z Logistics LLC · This is an automated confirmation email.
       </p>
     </div>
   </div>
 </body>
 </html>`,
-    });
+  });
 }
 
 // ── Email: Admin New Application Alert ────────────────────────────────────────
 export async function sendAdminNotificationEmail({
-    firstName,
-    lastName,
-    email,
-    position,
-    applicationId,
+  firstName,
+  lastName,
+  email,
+  position,
+  applicationId,
 }: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    position: string;
-    applicationId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  position: string;
+  applicationId: string;
 }) {
-    if (!ADMIN_EMAIL) return; // Skip silently if no admin email configured
+  if (!ADMIN_EMAIL) return; // Skip silently if no admin email configured
 
-    const resend = getResend();
-    const adminUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/admin/applications/${applicationId}`;
+  const resend = getResend();
+  const adminUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'}/admin/applications/${applicationId}`;
 
-    await resend.emails.send({
-        from: FROM_ADDRESS,
-        to: ADMIN_EMAIL,
-        subject: `New Application: ${firstName} ${lastName} — ${position}`,
-        html: `
+  await resend.emails.send({
+    from: FROM_ADDRESS,
+    to: ADMIN_EMAIL,
+    subject: `New Application: ${firstName} ${lastName} — ${position}`,
+    html: `
 <!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>New Application</title></head>
@@ -122,5 +122,5 @@ export async function sendAdminNotificationEmail({
   </div>
 </body>
 </html>`,
-    });
+  });
 }

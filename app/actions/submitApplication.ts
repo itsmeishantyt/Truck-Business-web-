@@ -3,6 +3,7 @@
 import { headers } from 'next/headers';
 import { applicationSchema } from '@/lib/schemas';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
+import { encrypt } from '@/lib/encryption';
 import { checkRateLimit } from '@/lib/rateLimit';
 import { sendApplicantConfirmationEmail, sendAdminNotificationEmail } from '@/lib/email';
 
@@ -46,6 +47,7 @@ export async function submitApplication(formData: FormData): Promise<SubmitResul
         lastName: formData.get('lastName') as string,
         ssn: formData.get('ssn') as string,
         dateOfBirth: formData.get('dateOfBirth') as string,
+        otherName: formData.get('otherName') as string,
         streetAddress1: formData.get('streetAddress1') as string,
         country: formData.get('country') as string,
         city: formData.get('city') as string,
@@ -56,6 +58,26 @@ export async function submitApplication(formData: FormData): Promise<SubmitResul
         email: formData.get('email') as string,
         confirmEmail: formData.get('confirmEmail') as string,
         position: formData.get('position') as string,
+        isOwnerOperator: formData.get('isOwnerOperator') as string,
+        location: formData.get('location') as string,
+        eligibleUS: formData.get('eligibleUS') as string,
+        currentlyEmployed: formData.get('currentlyEmployed') as string,
+        englishProficiency: formData.get('englishProficiency') as string,
+        workedBefore: formData.get('workedBefore') as string,
+        twicCard: formData.get('twicCard') as string,
+        howDidYouHear: formData.get('howDidYouHear') as string,
+        referralName: formData.get('referralName') as string,
+        otherHear: formData.get('otherHear') as string,
+        fmcsaRegistered: formData.get('fmcsaRegistered') as string,
+        militaryService: formData.get('militaryService') as string,
+        attendedSchool: formData.get('attendedSchool') as string,
+        employedLast10Years: formData.get('employedLast10Years') as string,
+        expStraightTruck: formData.get('expStraightTruck') as string,
+        expTractorSemi: formData.get('expTractorSemi') as string,
+        expTractorTwoTrailers: formData.get('expTractorTwoTrailers') as string,
+        expOther: formData.get('expOther') as string,
+        licenses: JSON.parse((formData.get('licenses') as string) || '[]'),
+        employmentHistory: JSON.parse((formData.get('employmentHistory') as string) || '[]'),
     };
 
     const parsed = applicationSchema.safeParse(rawData);
@@ -102,8 +124,9 @@ export async function submitApplication(formData: FormData): Promise<SubmitResul
         .insert({
             first_name: parsed.data.firstName,
             last_name: parsed.data.lastName,
-            ssn: parsed.data.ssn,
-            date_of_birth: parsed.data.dateOfBirth,
+            ssn: encrypt(parsed.data.ssn),
+            date_of_birth: encrypt(parsed.data.dateOfBirth),
+            other_name: parsed.data.otherName === 'yes',
             street_address_1: parsed.data.streetAddress1,
             country: parsed.data.country,
             city: parsed.data.city,
@@ -113,6 +136,26 @@ export async function submitApplication(formData: FormData): Promise<SubmitResul
             primary_phone: parsed.data.primaryPhone,
             email: parsed.data.email,
             position: parsed.data.position,
+            is_owner_operator: parsed.data.isOwnerOperator === 'yes',
+            location: parsed.data.location,
+            eligible_us: parsed.data.eligibleUS === 'yes',
+            currently_employed: parsed.data.currentlyEmployed === 'yes',
+            english_proficiency: parsed.data.englishProficiency === 'yes',
+            worked_before: parsed.data.workedBefore === 'yes',
+            twic_card: parsed.data.twicCard === 'yes',
+            how_did_you_hear: parsed.data.howDidYouHear,
+            referral_name: parsed.data.referralName,
+            other_hear: parsed.data.otherHear,
+            fmcsa_registered: parsed.data.fmcsaRegistered === 'yes',
+            military_service: parsed.data.militaryService === 'yes',
+            attended_school: parsed.data.attendedSchool === 'yes',
+            employed_last_10_years: parsed.data.employedLast10Years === 'yes',
+            exp_straight_truck: parsed.data.expStraightTruck,
+            exp_tractor_semi: parsed.data.expTractorSemi,
+            exp_tractor_two_trailers: parsed.data.expTractorTwoTrailers,
+            exp_other: parsed.data.expOther,
+            licenses: parsed.data.licenses,
+            employment_history: parsed.data.employmentHistory,
             resume_path: resumePath,
             status: 'pending',
         })

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getApplications } from '@/actions/adminActions';
 import { adminLogout } from '@/actions/adminActions';
+import { Truck, AlertTriangle, Inbox } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
     pending: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
@@ -39,13 +40,13 @@ export default async function AdminApplicationsPage({
     return (
         <div className="min-h-screen">
             {/* Top bar */}
-            <header className="border-b border-slate-700/60 bg-slate-800/50">
+            <header className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <span className="text-2xl">🚛</span>
+                        <span className="shrink-0 text-orange-400"><Truck className="w-8 h-8" /></span>
                         <div>
-                            <h1 className="font-bold text-white text-lg leading-none">TruckCo Admin</h1>
-                            <p className="text-slate-500 text-xs">Careers Dashboard</p>
+                            <h1 className="font-bold text-[var(--color-text)] text-lg leading-none">N&Z Logistics Admin</h1>
+                            <p className="text-[var(--color-muted)] text-xs">Careers Dashboard</p>
                         </div>
                     </div>
                     <form action={adminLogout}>
@@ -59,8 +60,8 @@ export default async function AdminApplicationsPage({
             <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
                 {/* Page title + stats */}
                 <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <h2 className="text-2xl font-bold text-white">Applications</h2>
-                    <p className="text-slate-400 text-sm">
+                    <h2 className="text-2xl font-bold text-[var(--color-text)]">Applications</h2>
+                    <p className="text-[var(--color-muted)] text-sm">
                         {applications.length} result{applications.length !== 1 ? 's' : ''}
                         {activeFilter !== 'all' && ` — filtered by "${activeFilter}"`}
                     </p>
@@ -74,7 +75,7 @@ export default async function AdminApplicationsPage({
                             href={f === 'all' ? '/admin/applications' : `?status=${f}`}
                             className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors capitalize ${activeFilter === f
                                 ? 'border-orange-500/50 bg-orange-500/10 text-orange-400'
-                                : 'border-slate-700 text-slate-400 hover:text-white hover:border-slate-500'
+                                : 'border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)] hover:border-slate-500'
                                 }`}
                         >
                             {f}
@@ -84,17 +85,18 @@ export default async function AdminApplicationsPage({
 
                 {/* Error state */}
                 {fetchError && (
-                    <div className="card text-center py-10">
-                        <p className="text-red-400">⚠️ {fetchError}</p>
+                    <div className="card text-center py-10 flex flex-col items-center justify-center gap-2">
+                        <AlertTriangle className="w-6 h-6 text-red-400" />
+                        <p className="text-red-400">{fetchError}</p>
                     </div>
                 )}
 
                 {/* Empty state */}
                 {!fetchError && applications.length === 0 && (
-                    <div className="card text-center py-16">
-                        <span className="text-4xl mb-3 block">📭</span>
-                        <p className="text-white font-semibold">No applications yet</p>
-                        <p className="text-slate-400 text-sm mt-1">
+                    <div className="card text-center py-16 flex flex-col items-center justify-center">
+                        <span className="mb-3 block text-[var(--color-muted)]"><Inbox className="w-12 h-12" /></span>
+                        <p className="text-[var(--color-text)] font-semibold">No applications yet</p>
+                        <p className="text-[var(--color-muted)] text-sm mt-1">
                             {activeFilter !== 'all'
                                 ? `No applications with status "${activeFilter}".`
                                 : 'Applications will appear here once candidates apply.'}
@@ -107,8 +109,8 @@ export default async function AdminApplicationsPage({
                     <div className="card overflow-hidden p-0">
                         <div className="overflow-x-auto">
                             <table className="w-full text-sm">
-                                <thead className="border-b border-slate-700/60 bg-slate-800/50">
-                                    <tr className="text-left text-xs text-slate-500 uppercase tracking-wider">
+                                <thead className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
+                                    <tr className="text-left text-xs text-[var(--color-muted)] uppercase tracking-wider">
                                         <th className="px-5 py-3.5 font-semibold">Name</th>
                                         <th className="px-5 py-3.5 font-semibold hidden sm:table-cell">Email</th>
                                         <th className="px-5 py-3.5 font-semibold hidden md:table-cell">Position</th>
@@ -119,16 +121,16 @@ export default async function AdminApplicationsPage({
                                 </thead>
                                 <tbody className="divide-y divide-slate-700/40">
                                     {applications.map((app) => (
-                                        <tr key={app.id} className="hover:bg-slate-800/40 transition-colors">
-                                            <td className="px-5 py-4 font-medium text-white">{app.first_name} {app.last_name}</td>
-                                            <td className="px-5 py-4 text-slate-400 hidden sm:table-cell">{app.email}</td>
-                                            <td className="px-5 py-4 text-slate-400 hidden md:table-cell max-w-xs truncate">{app.position}</td>
+                                        <tr key={app.id} className="hover:bg-[var(--color-surface)]/40 transition-colors">
+                                            <td className="px-5 py-4 font-medium text-[var(--color-text)]">{app.first_name} {app.last_name}</td>
+                                            <td className="px-5 py-4 text-[var(--color-muted)] hidden sm:table-cell">{app.email}</td>
+                                            <td className="px-5 py-4 text-[var(--color-muted)] hidden md:table-cell max-w-xs truncate">{app.position}</td>
                                             <td className="px-5 py-4">
-                                                <span className={`badge border ${statusColors[app.status] ?? 'bg-slate-700 text-slate-300'} capitalize`}>
+                                                <span className={`badge border ${statusColors[app.status] ?? 'bg-[var(--color-surface2)]'} capitalize`}>
                                                     {app.status}
                                                 </span>
                                             </td>
-                                            <td className="px-5 py-4 text-slate-400 hidden lg:table-cell">
+                                            <td className="px-5 py-4 text-[var(--color-muted)] hidden lg:table-cell">
                                                 {formatDate(app.created_at)}
                                             </td>
                                             <td className="px-5 py-4">

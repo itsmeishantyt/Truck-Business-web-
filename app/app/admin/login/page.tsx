@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { adminLogin } from '@/actions/adminActions';
+import { Truck } from 'lucide-react';
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -29,16 +30,16 @@ export default function AdminLoginPage() {
         <div className="min-h-screen flex items-center justify-center px-4">
             <div className="w-full max-w-sm">
                 {/* Logo */}
-                <div className="text-center mb-8">
-                    <span className="text-4xl block mb-2">🚛</span>
-                    <h1 className="text-2xl font-bold text-white">
+                <div className="text-center mb-10">
+                    <span className="shrink-0 text-orange-400 mb-4 inline-block"><Truck className="w-16 h-16" /></span>
+                    <h1 className="text-3xl font-bold text-[var(--color-text)] tracking-tight">
                         Truck<span className="text-orange-400">Co</span> Admin
                     </h1>
-                    <p className="text-slate-500 text-sm mt-1">Careers Dashboard</p>
+                    <p className="text-[var(--color-muted)] text-sm mt-1">Careers Dashboard</p>
                 </div>
 
                 <div className="card">
-                    <h2 className="text-lg font-semibold text-white mb-6">Sign In</h2>
+                    <h2 className="text-lg font-semibold text-[var(--color-text)] mb-6">Sign In</h2>
 
                     {error && (
                         <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
@@ -83,8 +84,8 @@ export default function AdminLoginPage() {
                     </form>
                 </div>
 
-                <p className="text-center text-xs text-slate-600 mt-5">
-                    This area is restricted to authorized personnel only.
+                <p className="text-center text-xs text-[var(--color-muted)] mt-5">
+                    Protected area. Unauthorized access is strictly prohibited.
                 </p>
             </div>
         </div>

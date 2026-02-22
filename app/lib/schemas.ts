@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
+const yesNoSchema = z.union([z.literal('yes'), z.literal('no')], { error: 'Please select yes or no' });
+
 export const applicationSchema = z
     .object({
         // ── Personal Information ──────────────────────────────────────────────
@@ -22,6 +24,7 @@ export const applicationSchema = z
         dateOfBirth: z
             .string()
             .regex(/^\d{2}\/\d{2}\/\d{4}$/, 'Enter date as MM/DD/YYYY'),
+        otherName: yesNoSchema,
 
         // ── Address ───────────────────────────────────────────────────────────
         streetAddress1: z
@@ -35,10 +38,7 @@ export const applicationSchema = z
             .string()
             .min(3, 'Zip/Postal code is required')
             .max(20),
-        livedAtAddress3PlusYears: z.union(
-            [z.literal('yes'), z.literal('no')],
-            { error: 'Please indicate if you have lived at this address for 3+ years' }
-        ),
+        livedAtAddress3PlusYears: yesNoSchema,
 
         // ── Contact ───────────────────────────────────────────────────────────
         primaryPhone: z
@@ -47,8 +47,46 @@ export const applicationSchema = z
         email: z.string().email('Enter a valid email address'),
         confirmEmail: z.string().email('Enter a valid email address'),
 
-        // ── Position ──────────────────────────────────────────────────────────
+        // ── Position & General Info ───────────────────────────────────────────
         position: z.string().min(2, 'Please select a position'),
+        isOwnerOperator: yesNoSchema,
+        location: z.string().min(1, 'Location is required'),
+        eligibleUS: yesNoSchema,
+        currentlyEmployed: yesNoSchema,
+        englishProficiency: yesNoSchema,
+        workedBefore: yesNoSchema,
+        twicCard: yesNoSchema,
+        howDidYouHear: z.string().min(1, 'Please select an option'),
+        referralName: z.string().optional(),
+        otherHear: z.string().optional(),
+        fmcsaRegistered: yesNoSchema,
+        militaryService: yesNoSchema,
+        attendedSchool: yesNoSchema,
+        employedLast10Years: yesNoSchema,
+
+        // ── Driving Experience ────────────────────────────────────────────────
+        expStraightTruck: z.string().min(1, 'Please select an option'),
+        expTractorSemi: z.string().min(1, 'Please select an option'),
+        expTractorTwoTrailers: z.string().min(1, 'Please select an option'),
+        expOther: z.string().min(1, 'Please provide information or enter None'),
+
+        // ── Dynamic Lists ─────────────────────────────────────────────────────
+        licenses: z.array(z.object({
+            licenseNumber: z.string().min(1, 'Required'),
+            country: z.string().min(1, 'Required'),
+            state: z.string().min(1, 'Required'),
+            expirationDate: z.string().min(1, 'Required'),
+            dotMedicalCardExpiration: z.string().optional(),
+            isCurrent: yesNoSchema,
+            isCommercial: yesNoSchema,
+            endorsements: z.array(z.string()).default([]),
+        })).min(1, 'At least one license is required'),
+        employmentHistory: z.array(z.object({
+            employerName: z.string().min(1, 'Required'),
+            startDate: z.string().min(1, 'Required'),
+            endDate: z.string().min(1, 'Required'),
+            positionTitle: z.string().optional(),
+        })).default([]),
     })
     .refine((data) => data.email === data.confirmEmail, {
         message: "Email addresses don't match",

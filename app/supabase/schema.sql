@@ -1,5 +1,5 @@
 -- ============================================================
--- TruckCo Job Application Website — Supabase Schema
+-- N&Z Logistics LLC Job Application Website — Supabase Schema
 -- Run this in your Supabase project's SQL Editor
 -- ============================================================
 
@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS applications (
   last_name                   TEXT         NOT NULL,
   ssn                         TEXT         NOT NULL,       -- ⚠️ Stored as plain text — encrypt at rest in production
   date_of_birth               TEXT         NOT NULL,       -- Format: MM/DD/YYYY
+  other_name                  BOOLEAN      NOT NULL,
 
   -- Address
   street_address_1            TEXT         NOT NULL,
@@ -25,8 +26,34 @@ CREATE TABLE IF NOT EXISTS applications (
   primary_phone               TEXT         NOT NULL,
   email                       TEXT         NOT NULL,
 
-  -- Position & File
+  -- General Information
   position                    TEXT         NOT NULL,
+  is_owner_operator           BOOLEAN      NOT NULL,
+  location                    TEXT         NOT NULL,
+  eligible_us                 BOOLEAN      NOT NULL,
+  currently_employed          BOOLEAN      NOT NULL,
+  english_proficiency         BOOLEAN      NOT NULL,
+  worked_before               BOOLEAN      NOT NULL,
+  twic_card                   BOOLEAN      NOT NULL,
+  how_did_you_hear            TEXT         NOT NULL,
+  referral_name               TEXT,
+  other_hear                  TEXT,
+  fmcsa_registered            BOOLEAN      NOT NULL,
+  military_service            BOOLEAN      NOT NULL,
+  attended_school             BOOLEAN      NOT NULL,
+  employed_last_10_years      BOOLEAN      NOT NULL,
+
+  -- Driving Experience
+  exp_straight_truck          TEXT         NOT NULL,
+  exp_tractor_semi            TEXT         NOT NULL,
+  exp_tractor_two_trailers    TEXT         NOT NULL,
+  exp_other                   TEXT         NOT NULL,
+
+  -- Dynamic Lists (Stored as JSON for simplicity)
+  licenses                    JSONB        NOT NULL DEFAULT '[]'::jsonb,
+  employment_history          JSONB        NOT NULL DEFAULT '[]'::jsonb,
+
+  -- File
   resume_path                 TEXT,                        -- Supabase Storage path
 
   -- Status (managed by admin)

@@ -1,0 +1,58 @@
+﻿components/ApplyForm.tsx(166,113): error TS1127: Invalid character.
+components/ApplyForm.tsx(166,139): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(166,140): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(166,143): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(278,29): error TS2657: JSX expressions must have one parent element.
+components/ApplyForm.tsx(286,180): error TS1127: Invalid character.
+components/ApplyForm.tsx(286,226): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(286,229): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(287,143): error TS1127: Invalid character.
+components/ApplyForm.tsx(287,183): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(287,186): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(289,102): error TS1127: Invalid character.
+components/ApplyForm.tsx(289,140): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(289,141): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(292,43): error TS17002: Expected corresponding JSX closing tag for 'Field'.
+components/ApplyForm.tsx(293,39): error TS17002: Expected corresponding JSX closing tag for 'div'.
+components/ApplyForm.tsx(294,178): error TS1127: Invalid character.
+components/ApplyForm.tsx(294,225): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(294,228): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(295,183): error TS1127: Invalid character.
+components/ApplyForm.tsx(295,240): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(295,243): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(298,148): error TS1127: Invalid character.
+components/ApplyForm.tsx(298,180): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(298,183): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(299,151): error TS1127: Invalid character.
+components/ApplyForm.tsx(299,186): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(299,189): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(306,133): error TS1127: Invalid character.
+components/ApplyForm.tsx(306,178): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(306,181): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(312,29): error TS1005: ')' expected.
+components/ApplyForm.tsx(314,21): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(314,23): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(320,11): error TS17002: Expected corresponding JSX closing tag for 'form'.
+components/ApplyForm.tsx(322,13): error TS1005: ')' expected.
+components/ApplyForm.tsx(349,191): error TS1127: Invalid character.
+components/ApplyForm.tsx(349,245): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(349,248): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(350,168): error TS1127: Invalid character.
+components/ApplyForm.tsx(350,223): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(350,226): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(351,161): error TS1127: Invalid character.
+components/ApplyForm.tsx(351,212): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(351,215): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(352,182): error TS1127: Invalid character.
+components/ApplyForm.tsx(352,231): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(352,234): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(373,33): error TS1127: Invalid character.
+components/ApplyForm.tsx(373,292): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/ApplyForm.tsx(373,339): error TS1382: Unexpected token. Did you mean `{'>'}` or `&gt;`?
+components/ApplyForm.tsx(394,13): error TS1128: Declaration or statement expected.
+components/ApplyForm.tsx(397,15): error TS1005: ';' expected.
+components/ApplyForm.tsx(398,20): error TS1005: ',' expected.
+components/ApplyForm.tsx(412,13): error TS1128: Declaration or statement expected.
+components/ApplyForm.tsx(413,9): error TS1109: Expression expected.
+components/ApplyForm.tsx(414,5): error TS1109: Expression expected.
+components/ApplyForm.tsx(415,1): error TS1128: Declaration or statement expected.

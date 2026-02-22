@@ -1,15 +1,41 @@
 @import "tailwindcss";
 
 @layer base {
+
+  /* Soft Cool Gray Light Theme (Non-White) */
   :root {
-    --color-primary: #f97316;   /* orange-500 */
-    --color-primary-dark: #ea580c; /* orange-600 */
-    --color-bg: #0f172a;        /* slate-900 */
-    --color-surface: #1e293b;   /* slate-800 */
-    --color-surface2: #334155;  /* slate-700 */
-    --color-text: #f8fafc;      /* slate-50 */
-    --color-muted: #94a3b8;     /* slate-400 */
-    --color-border: #334155;    /* slate-700 */
+    --color-primary: #f97316;
+    --color-primary-dark: #ea580c;
+    --color-bg: #f3f4f6;
+    /* Soft cool gray (gray-100) */
+    --color-surface: #ffffff;
+    /* Keep cards white for contrast */
+    --color-surface2: #e5e7eb;
+    /* Hover/tags (gray-200) */
+    --color-text: #1f2937;
+    /* Dark gray text (gray-800) */
+    --color-muted: #6b7280;
+    /* Medium gray text (gray-500) */
+    --color-border: #d1d5db;
+    /* Border (gray-300) */
+  }
+
+  /* Deep Stone Dark Theme */
+  .dark {
+    --color-primary: #f97316;
+    --color-primary-dark: #ea580c;
+    --color-bg: #0c0a09;
+    /* stone-950 - luxurious deep warm black */
+    --color-surface: #1c1917;
+    /* stone-900 */
+    --color-surface2: #292524;
+    /* stone-800 */
+    --color-text: #fafaf9;
+    /* stone-50 - warm off-white text */
+    --color-muted: #a8a29e;
+    /* stone-400 */
+    --color-border: #292524;
+    /* stone-800 */
   }
 
   * {
@@ -37,43 +63,53 @@
     background: linear-gradient(135deg, #f97316, #ea580c);
     box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
   }
+
   .btn-primary:hover {
     transform: translateY(-1px);
     box-shadow: 0 8px 30px rgba(249, 115, 22, 0.45);
   }
+
   .btn-primary:active {
     transform: translateY(0);
   }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 border;
-    color: var(--color-text);
-    border-color: var(--color-border);
-    background: var(--color-surface);
+    color: var(--text);
+    border-color: var(--border);
+    background: var(--surface);
   }
+
   .btn-secondary:hover {
     border-color: #f97316;
     color: #f97316;
   }
 
   .card {
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
+    background: var(--surface);
+    border: 1px solid var(--border);
     @apply rounded-2xl p-6;
   }
 
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl text-white placeholder-slate-400 outline-none transition-all duration-200;
-    background: var(--color-surface2);
-    border: 1.5px solid var(--color-border);
+    @apply w-full px-4 py-3 rounded-xl outline-none transition-all duration-200;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
   }
+
+  .input-field::placeholder {
+    color: var(--muted);
+  }
+
   .input-field:focus {
     border-color: #f97316;
     box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
   }
 
   .label {
-    @apply block text-sm font-medium text-slate-300 mb-1.5;
+    @apply block text-sm font-medium mb-1.5;
+    color: var(--text);
   }
 
   .error-text {

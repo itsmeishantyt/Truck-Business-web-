@@ -1,5 +1,5 @@
 -- ============================================================
--- TruckCo — Supabase Storage Setup
+-- N&Z Logistics LLC — Supabase Storage Setup
 -- Run this in your Supabase SQL Editor
 -- ============================================================
 

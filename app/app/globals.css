@@ -59,7 +59,7 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold text-white transition-all duration-200 shadow-lg;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white transition-all duration-200 shadow-lg;
     background: linear-gradient(135deg, #f97316, #ea580c);
     box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
   }
@@ -74,7 +74,7 @@
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200 border;
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 border;
     color: var(--text);
     border-color: var(--border);
     background: var(--surface);
@@ -117,7 +117,7 @@
   }
 
   .section-heading {
-    @apply text-3xl md:text-4xl font-bold tracking-tight;
+    @apply text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight;
   }
 
   .badge {

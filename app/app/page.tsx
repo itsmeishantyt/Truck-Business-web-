@@ -21,30 +21,30 @@ export default function HomePage() {
   return (
     <>
       {/* ── Hero ─────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden px-4 pt-20 pb-32">
+      <section className="relative overflow-hidden px-4 py-16 md:py-24 lg:py-32 flex justify-center items-center min-h-[85vh]">
         {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-b from-orange-400/5 via-[var(--color-bg)] to-[var(--color-bg)] pointer-events-none transition-colors duration-500" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(249,115,22,0.1),transparent_50%)] pointer-events-none" />
 
-        <div className="relative max-w-5xl mx-auto text-center flex flex-col items-center">
-          <img src="/logo.webp" alt="N&Z Logistics LLC" className="h-32 md:h-48 w-auto mb-12 dark:drop-shadow-[0_0_20px_rgba(255,255,255,0.1)] drop-shadow-xl transition-transform hover:scale-[1.02]" />
+        <div className="relative max-w-5xl mx-auto text-center flex flex-col items-center justify-center">
+          <img src="/logo.webp" alt="N&Z Logistics LLC" className="h-24 md:h-32 w-auto mb-10 dark:drop-shadow-[0_0_20px_rgba(255,255,255,0.1)] drop-shadow-xl transition-transform hover:scale-[1.02]" />
 
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/20 mb-6 shadow-sm">
             <Truck className="w-4 h-4" /> Now Hiring — Multiple Positions Open
           </span>
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
             Drive Your Career
             <br />
             <span className="bg-gradient-to-r from-orange-500 to-orange-300 bg-clip-text text-transparent">
               Forward With Us
             </span>
           </h1>
-          <p className="text-[var(--color-muted)] text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-[var(--color-muted)] text-base md:text-lg lg:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
             N&Z Logistics LLC is one of the fastest-growing logistics companies in the nation.
             We&apos;re building a team of dedicated professionals — and we want you on board.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/apply" className="btn-primary text-base px-8 py-3.5 w-full sm:w-auto">
+            <Link href="/apply-form/index.html" className="btn-primary text-base px-8 py-3.5 w-full sm:w-auto">
               Apply Now →
             </Link>
             <Link href="/about" className="btn-secondary text-base px-8 py-3.5 w-full sm:w-auto">
@@ -55,15 +55,15 @@ export default function HomePage() {
       </section>
 
       {/* ── About Introduction ─────────────────────────────────────── */}
-      <section className="px-4 py-16 max-w-4xl mx-auto text-center">
-        <p className="text-[var(--color-muted)] text-xl md:text-2xl leading-relaxed font-medium">
+      <section className="px-4 py-16 md:py-24 max-w-4xl mx-auto text-center">
+        <p className="text-[var(--color-muted)] text-lg md:text-xl lg:text-2xl leading-relaxed font-medium">
           We are a family-owned trucking business with decades of experience. We know your fleet’s needs and ensure every delivery is on time, driven by a team of trusted, experienced professionals.
         </p>
       </section>
 
       {/* ── Stats ─────────────────────────────────────────────── */}
       <section className="border-y border-[var(--color-border)] bg-[var(--color-surface)]/30">
-        <div className="max-w-5xl mx-auto px-4 py-10 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div className="max-w-5xl mx-auto px-4 py-16 md:py-24 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-6 text-center">
           {[
             { num: '500+', label: 'Drivers Nationwide' },
             { num: '15+', label: 'Years in Business' },
@@ -79,8 +79,8 @@ export default function HomePage() {
       </section>
 
       {/* ── Why Join Us ────────────────────────────────────────── */}
-      <section className="max-w-6xl mx-auto px-4 py-20">
-        <div className="text-center mb-12">
+      <section className="max-w-6xl mx-auto px-4 py-16 md:py-24">
+        <div className="text-center mb-12 md:mb-16">
           <h2 className="section-heading mb-3">Why Join N&Z Logistics LLC?</h2>
           <p className="text-[var(--color-muted)] max-w-xl mx-auto">
             We take care of our people — so our people can focus on doing their best work.
@@ -102,8 +102,8 @@ export default function HomePage() {
 
       {/* ── Open Positions ─────────────────────────────────────── */}
       <section className="bg-[var(--color-surface)]/40 border-t border-[var(--color-border)]">
-        <div className="max-w-4xl mx-auto px-4 py-20">
-          <div className="text-center mb-10">
+        <div className="max-w-4xl mx-auto px-4 py-16 md:py-24">
+          <div className="text-center mb-10 md:mb-12">
             <h2 className="section-heading mb-3">Open Positions</h2>
             <p className="text-[var(--color-muted)]">Find a role that fits your skills and goals.</p>
           </div>
@@ -126,7 +126,7 @@ export default function HomePage() {
             ))}
           </div>
           <div className="text-center">
-            <Link href="/apply" className="btn-primary text-base px-10 py-3.5">
+            <Link href="/apply-form/index.html" className="btn-primary text-base px-10 py-3.5">
               Submit Your Application
             </Link>
           </div>

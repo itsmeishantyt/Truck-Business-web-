@@ -4,8 +4,8 @@ import { createServerClient } from '@supabase/ssr';
 export async function middleware(request: NextRequest) {
     const pathname = request.nextUrl.pathname;
 
-    // Only protect /admin/* routes (not /admin/login)
-    if (!pathname.startsWith('/admin') || pathname.startsWith('/admin/login')) {
+    // Only protect /admin/* routes (not /admin/login or exact /admin)
+    if (!pathname.startsWith('/admin') || pathname.startsWith('/admin/login') || pathname === '/admin') {
         return NextResponse.next();
     }
 

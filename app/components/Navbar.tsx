@@ -39,10 +39,10 @@ export default function Navbar() {
     return (
         <header className="sticky top-0 z-50 border-b border-[var(--color-border)] backdrop-blur-md bg-[var(--color-bg)]/80 transition-all duration-300 py-4">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex items-center justify-between h-28 md:h-36">
+                <div className="flex items-center justify-between h-16 md:h-20">
                     {/* Logo (Left) */}
                     <Link href="/" className="flex items-center hover:opacity-90 transition-opacity">
-                        <img src="/logo.webp" alt="N&Z Logistics LLC" className="h-14 md:h-20 w-auto dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.05)] drop-shadow-md transition-transform hover:scale-105" />
+                        <img src="/logo.webp" alt="N&Z Logistics LLC" className="h-10 md:h-12 w-auto dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.05)] drop-shadow-md transition-transform hover:scale-105" />
                     </Link>
 
                     {/* Desktop nav (Center) */}
@@ -64,7 +64,7 @@ export default function Navbar() {
                     {/* CTA (Right) */}
                     <div className="hidden md:flex items-center justify-end gap-6 flex-1">
                         <ThemeToggle />
-                        <Link href="/apply" className="btn-primary text-lg px-8 py-4 shadow-md hover:shadow-lg">
+                        <Link href="/apply-form/index.html" className="btn-primary text-base px-6 py-2.5 shadow-md hover:shadow-lg">
                             Apply Now
                         </Link>
                     </div>
@@ -105,7 +105,7 @@ export default function Navbar() {
                             </Link>
                         ))}
                         <Link
-                            href="/apply"
+                            href="/apply-form/index.html"
                             onClick={() => setMenuOpen(false)}
                             className="btn-primary text-base px-5 py-3 mt-3 w-full"
                         >

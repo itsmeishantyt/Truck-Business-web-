@@ -51,9 +51,9 @@ export default function Navbar() {
                     {/* Logo */}
                     <Link href="/" className="flex items-center hover:opacity-90 transition-opacity group">
                         <img
-                            src="/logo.webp"
+                            src="/logo.svg"
                             alt="N&Z Logistics LLC"
-                            className="h-9 md:h-11 w-auto transition-all duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,0.3)]"
+                            className="h-9 md:h-11 w-auto transition-all duration-300 group-hover:scale-105 dark:invert group-hover:drop-shadow-[0_0_12px_rgba(255,255,255,0.3)]"
                         />
                     </Link>
 

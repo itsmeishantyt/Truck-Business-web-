@@ -115,8 +115,8 @@ export default function AdminFormBuilder() {
             <div className="min-h-screen flex items-center justify-center bg-gray-900 p-4">
                 <div className="bg-gray-800 p-8 rounded-xl shadow-2xl max-w-md w-full border border-gray-700">
                     <div className="flex justify-center mb-6">
-                        <div className="w-16 h-16 bg-orange-500/10 rounded-full flex items-center justify-center">
-                            <LogIn className="w-8 h-8 text-orange-500" />
+                        <div className="w-16 h-16 bg-[var(--color-surface3)] rounded-full flex items-center justify-center">
+                            <LogIn className="w-8 h-8 text-[var(--color-text)]" />
                         </div>
                     </div>
                     <h1 className="text-2xl font-bold text-white text-center mb-6">Admin Panel</h1>
@@ -127,14 +127,14 @@ export default function AdminFormBuilder() {
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition-all"
+                                className="w-full bg-[var(--color-surface2)] border border-[var(--color-border)] rounded-lg px-4 py-3 text-[var(--color-text)] focus:ring-2 focus:ring-white/20 focus:border-[var(--color-border-strong)] outline-none transition-all"
                                 placeholder="Admin password"
                                 required
                             />
                         </div>
                         <button
                             type="submit"
-                            className="w-full bg-orange-600 hover:bg-orange-500 text-white font-medium py-3 rounded-lg transition-colors shadow-lg shadow-orange-500/20"
+                            className="w-full bg-white hover:bg-gray-100 text-black font-medium py-3 rounded-lg transition-colors shadow-lg shadow-white/10"
                         >
                             Log In
                         </button>
@@ -167,7 +167,7 @@ export default function AdminFormBuilder() {
                         <button
                             onClick={handleSave}
                             disabled={isLoading}
-                            className="flex items-center gap-2 bg-orange-600 hover:bg-orange-500 text-white font-medium px-6 py-2.5 rounded-lg transition-colors shadow-lg shadow-orange-500/20 disabled:opacity-50"
+                            className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black font-medium px-6 py-2.5 rounded-lg transition-colors shadow-lg shadow-white/10 disabled:opacity-50"
                         >
                             <Save className="w-4 h-4" />
                             {isLoading ? 'Saving...' : 'Save Configuration'}
@@ -195,7 +195,7 @@ export default function AdminFormBuilder() {
                                                 type="text"
                                                 value={q.title || ''}
                                                 onChange={(e) => updateQuestion(index, 'title', e.target.value)}
-                                                className="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white focus:ring-1 focus:ring-orange-500 outline-none"
+                                                className="w-full bg-[var(--color-surface2)] border border-[var(--color-border)] rounded-md px-3 py-2 text-[var(--color-text)] focus:ring-1 focus:ring-white/20 outline-none"
                                             />
                                         </div>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -214,7 +214,7 @@ export default function AdminFormBuilder() {
                                                     type="text"
                                                     value={q.placeholder || ''}
                                                     onChange={(e) => updateQuestion(index, 'placeholder', e.target.value)}
-                                                    className="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white focus:ring-1 focus:ring-orange-500 outline-none"
+                                                    className="w-full bg-[var(--color-surface2)] border border-[var(--color-border)] rounded-md px-3 py-2 text-[var(--color-text)] focus:ring-1 focus:ring-white/20 outline-none"
                                                     disabled={q.type === 'options'}
                                                 />
                                             </div>
@@ -226,7 +226,7 @@ export default function AdminFormBuilder() {
                                                     type="text"
                                                     value={(q.options || []).join(', ')}
                                                     onChange={(e) => updateOptions(index, e.target.value)}
-                                                    className="w-full bg-gray-900 border border-orange-500/30 rounded-md px-3 py-2 text-white focus:ring-1 focus:ring-orange-500 outline-none"
+                                                    className="w-full bg-[var(--color-surface2)] border border-[var(--color-border-strong)] rounded-md px-3 py-2 text-[var(--color-text)] focus:ring-1 focus:ring-white/20 outline-none"
                                                     placeholder="Option 1, Option 2, Option 3"
                                                 />
                                             </div>
@@ -237,7 +237,7 @@ export default function AdminFormBuilder() {
                                                 type="text"
                                                 value={q.errorMessage || ''}
                                                 onChange={(e) => updateQuestion(index, 'errorMessage', e.target.value)}
-                                                className="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white focus:ring-1 focus:ring-orange-500 outline-none"
+                                                className="w-full bg-[var(--color-surface2)] border border-[var(--color-border)] rounded-md px-3 py-2 text-[var(--color-text)] focus:ring-1 focus:ring-white/20 outline-none"
                                             />
                                         </div>
                                     </div>
@@ -248,7 +248,7 @@ export default function AdminFormBuilder() {
                                             <select
                                                 value={q.type || 'text'}
                                                 onChange={(e) => updateQuestion(index, 'type', e.target.value)}
-                                                className="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-white focus:ring-1 focus:ring-orange-500 outline-none"
+                                                className="w-full bg-[var(--color-surface2)] border border-[var(--color-border)] rounded-md px-3 py-2 text-[var(--color-text)] focus:ring-1 focus:ring-white/20 outline-none"
                                             >
                                                 <option value="text">Short Text</option>
                                                 <option value="email">Email</option>
@@ -257,13 +257,25 @@ export default function AdminFormBuilder() {
                                                 <option value="options">Multiple Choice</option>
                                             </select>
                                         </div>
-                                        <div className="flex items-center gap-3 mt-4">
+                                        <div className="flex flex-col gap-1">
+                                            <label className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Layout Mode</label>
+                                            <select
+                                                value={q.display_mode || 'single'}
+                                                onChange={(e) => updateQuestion(index, 'display_mode', e.target.value)}
+                                                className="w-full bg-[var(--color-surface2)] border border-[var(--color-border)] rounded-md px-3 py-2 text-[var(--color-text)] focus:ring-1 focus:ring-white/20 outline-none"
+                                            >
+                                                <option value="single">Single (Typeform — one at a time)</option>
+                                                <option value="page">Page (Google Form — grouped)</option>
+                                            </select>
+                                            <p className="text-xs text-[var(--color-muted)] mt-0.5">Consecutive &apos;Page&apos; questions are grouped on one scrollable card page.</p>
+                                        </div>
+                                        <div className="flex items-center gap-3 mt-1">
                                             <input
                                                 type="checkbox"
                                                 id={`req-${index}`}
                                                 checked={q.required || false}
                                                 onChange={(e) => updateQuestion(index, 'required', e.target.checked)}
-                                                className="w-4 h-4 accent-orange-500"
+                                                className="w-4 h-4"
                                             />
                                             <label htmlFor={`req-${index}`} className="text-sm text-gray-300">Required field</label>
                                         </div>
@@ -283,7 +295,7 @@ export default function AdminFormBuilder() {
                     {config.length === 0 && !isLoading && (
                         <div className="text-center py-12 bg-gray-800 rounded-lg border border-gray-700 border-dashed">
                             <p className="text-gray-400 mb-4">No questions configured yet.</p>
-                            <button onClick={addQuestion} className="text-orange-400 hover:text-orange-300 font-medium">
+                            <button onClick={addQuestion} className="text-[var(--color-muted)] hover:text-[var(--color-text)] font-medium">
                                 + Add First Question
                             </button>
                         </div>

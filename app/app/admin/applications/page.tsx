@@ -56,11 +56,6 @@ export default async function AdminApplicationsPage({
                         <Link href="/admin" className="btn-primary text-sm px-4 py-2 flex items-center gap-2">
                             Form Builder
                         </Link>
-                        <form action={adminLogout}>
-                            <button type="submit" className="btn-secondary text-sm px-4 py-2">
-                                Sign Out
-                            </button>
-                        </form>
                     </div>
                 </div>
             </header>

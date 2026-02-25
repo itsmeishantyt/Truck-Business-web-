@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Plus, Trash2, GripVertical, Save, LogIn } from 'lucide-react';
 
 export default function AdminFormBuilder() {
@@ -157,6 +158,12 @@ export default function AdminFormBuilder() {
                                 {message.text}
                             </span>
                         )}
+                        <Link
+                            href="/admin/local-submissions"
+                            className="flex items-center gap-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white font-medium px-6 py-2.5 rounded-lg transition-colors"
+                        >
+                            View Submissions
+                        </Link>
                         <button
                             onClick={handleSave}
                             disabled={isLoading}

@@ -1,41 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Syne:wght@700;800&display=swap');
 @import "tailwindcss";
 
 @layer base {
 
-  /* Soft Cool Gray Light Theme (Non-White) */
   :root {
-    --color-primary: #f97316;
-    --color-primary-dark: #ea580c;
-    --color-bg: #f3f4f6;
-    /* Soft cool gray (gray-100) */
+    /* Light mode — crisp white with high contrast */
+    --color-primary: #ffffff;
+    --color-primary-dark: #e5e5e5;
+    --color-primary-glow: rgba(255, 255, 255, 0.35);
+    --color-accent-glow: rgba(200, 200, 220, 0.25);
+
+    --color-bg: #f8f8f8;
     --color-surface: #ffffff;
-    /* Keep cards white for contrast */
-    --color-surface2: #e5e7eb;
-    /* Hover/tags (gray-200) */
-    --color-text: #1f2937;
-    /* Dark gray text (gray-800) */
-    --color-muted: #6b7280;
-    /* Medium gray text (gray-500) */
-    --color-border: #d1d5db;
-    /* Border (gray-300) */
+    --color-surface2: #f0f0f0;
+    --color-surface3: #e8e8e8;
+    --color-text: #0a0a0a;
+    --color-muted: #6b6b6b;
+    --color-border: #e0e0e0;
+    --color-border-strong: #b0b0b0;
   }
 
-  /* Deep Stone Dark Theme */
   .dark {
-    --color-primary: #f97316;
-    --color-primary-dark: #ea580c;
-    --color-bg: #0c0a09;
-    /* stone-950 - luxurious deep warm black */
-    --color-surface: #1c1917;
-    /* stone-900 */
-    --color-surface2: #292524;
-    /* stone-800 */
-    --color-text: #fafaf9;
-    /* stone-50 - warm off-white text */
-    --color-muted: #a8a29e;
-    /* stone-400 */
-    --color-border: #292524;
-    /* stone-800 */
+    /* Dark mode — deep true black with white glows */
+    --color-primary: #ffffff;
+    --color-primary-dark: #d4d4d4;
+    --color-primary-glow: rgba(255, 255, 255, 0.12);
+    --color-accent-glow: rgba(180, 180, 255, 0.08);
+
+    --color-bg: #050505;
+    --color-surface: #0f0f0f;
+    --color-surface2: #1a1a1a;
+    --color-surface3: #242424;
+    --color-text: #f2f2f2;
+    --color-muted: #888888;
+    --color-border: #1f1f1f;
+    --color-border-strong: #333333;
   }
 
   * {
@@ -53,63 +52,121 @@
     color: var(--color-text);
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     min-height: 100vh;
+    line-height: 1.6;
+  }
+
+  ::selection {
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--color-text);
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border-strong);
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted);
   }
 }
 
 @layer components {
+
+  /* ── Primary Button — white with glow ──────────── */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-white transition-all duration-200 shadow-lg;
-    background: linear-gradient(135deg, #f97316, #ea580c);
-    box-shadow: 0 4px 20px rgba(249, 115, 22, 0.3);
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300;
+    background: #ffffff;
+    color: #0a0a0a;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+      0 4px 20px rgba(255, 255, 255, 0.15),
+      0 1px 4px rgba(0, 0, 0, 0.4);
+    letter-spacing: -0.01em;
   }
 
   .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 30px rgba(249, 115, 22, 0.45);
+    transform: translateY(-2px);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.15) inset,
+      0 0 40px rgba(255, 255, 255, 0.30),
+      0 8px 32px rgba(255, 255, 255, 0.12),
+      0 2px 8px rgba(0, 0, 0, 0.5);
+    filter: brightness(1.04);
   }
 
   .btn-primary:active {
     transform: translateY(0);
   }
 
+  /* ── Secondary Button — bordered ghost ──────────── */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-semibold transition-all duration-200 border;
-    color: var(--text);
-    border-color: var(--border);
-    background: var(--surface);
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300;
+    color: var(--color-text);
+    border: 1.5px solid var(--color-border-strong);
+    background: transparent;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .btn-secondary:hover {
-    border-color: #f97316;
-    color: #f97316;
+    border-color: var(--color-text);
+    transform: translateY(-1px);
+    box-shadow: 0 0 20px var(--color-primary-glow);
   }
 
+  /* ── Card ───────────────────────────────────────── */
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    @apply rounded-2xl p-6;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    @apply rounded-3xl p-6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
   }
 
+  /* ── Glass Card ─────────────────────────────────── */
+  .card-glass {
+    background: color-mix(in srgb, var(--color-surface) 55%, transparent);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    border: 1px solid color-mix(in srgb, var(--color-border-strong) 50%, transparent);
+    @apply rounded-3xl p-6;
+    box-shadow:
+      0 4px 24px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  }
+
+  /* ── Input ──────────────────────────────────────── */
   .input-field {
-    @apply w-full px-4 py-3 rounded-xl outline-none transition-all duration-200;
-    color: var(--text);
-    background: var(--surface2);
-    border: 1.5px solid var(--border);
+    @apply w-full px-4 py-3 rounded-2xl outline-none transition-all duration-200 text-sm;
+    color: var(--color-text);
+    background: var(--color-surface2);
+    border: 1.5px solid var(--color-border);
   }
 
   .input-field::placeholder {
-    color: var(--muted);
+    color: var(--color-muted);
   }
 
   .input-field:focus {
-    border-color: #f97316;
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+    border-color: var(--color-border-strong);
+    box-shadow: 0 0 0 4px var(--color-primary-glow);
+    background: var(--color-surface);
   }
 
+  /* ── Typography ─────────────────────────────────── */
   .label {
     @apply block text-sm font-medium mb-1.5;
-    color: var(--text);
+    color: var(--color-muted);
+    letter-spacing: 0.01em;
   }
 
   .error-text {
@@ -117,10 +174,34 @@
   }
 
   .section-heading {
-    @apply text-3xl md:text-4xl lg:text-5xl font-extrabold tracking-tight;
+    @apply text-3xl md:text-4xl lg:text-5xl font-extrabold;
+    font-family: 'Syne', 'Inter', sans-serif;
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+  }
+
+  .eyebrow {
+    @apply inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold uppercase;
+    background: color-mix(in srgb, var(--color-text) 8%, transparent);
+    color: var(--color-muted);
+    border: 1px solid var(--color-border-strong);
+    letter-spacing: 0.14em;
   }
 
   .badge {
     @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+
+  /* ── Gradient text — white shimmer ─────────────── */
+  .gradient-text {
+    background: linear-gradient(135deg, #ffffff 0%, #a0a0a0 50%, #ffffff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ── Glow utility ──────────────────────────────── */
+  .glow-white {
+    box-shadow: 0 0 60px rgba(255, 255, 255, 0.08), 0 0 120px rgba(255, 255, 255, 0.04);
   }
 }

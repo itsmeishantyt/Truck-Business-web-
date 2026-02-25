@@ -1,443 +1,658 @@
-let flow = []; // Will be populated dynamically
+/**
+ * N&Z Logistics — Apply Form Engine
+ * Supports two layout modes per question:
+ *   display_mode: 'single'  → Typeform-style, one question full-screen
+ *   display_mode: 'page'    → Google Form-style, questions grouped on a scrollable page
+ *
+ * The form engine groups consecutive 'page' questions into a shared page,
+ * and shows each 'single' question individually. Mixed configs are supported.
+ */
 
+// ── State ───────────────────────────────────────────────────────────────────
 const state = {
-    currentIndex: 0,
+    segments: [],       // Array of { type: 'single'|'page'|'welcome'|'success', steps: [...] }
+    segmentIndex: 0,    // Current segment index
     answers: {},
     isTransitioning: false
 };
 
-const appEl = document.getElementById('app');
-const progressContainer = document.getElementById('progress-container');
-const progressBar = document.getElementById('progress-bar');
-const controlsContainer = document.getElementById('controls-container');
+// ── DOM refs ────────────────────────────────────────────────────────────────
+const singleView = document.getElementById('single-view');
+const pageView = document.getElementById('page-view');
+const pageForm = document.getElementById('page-form');
+const pageSubmitBar = document.getElementById('page-submit-bar');
+const pageNextBtn = document.getElementById('page-next-btn');
+const pageBackBtn = document.getElementById('page-back-btn');
+const progressTrack = document.getElementById('progress-bar-track');
+const progressFill = document.getElementById('progress-bar-fill');
+const stepCounter = document.getElementById('step-counter');
+const controls = document.getElementById('controls');
 const btnUp = document.getElementById('btn-up');
 const btnDown = document.getElementById('btn-down');
 
-// Initialize
+// ── Boot ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
-    // Show a loading state conceptually
-    appEl.innerHTML = '<div class="text-gray-400 text-center flex flex-col items-center justify-center w-full h-full"><div class="animate-pulse flex flex-col items-center"><div class="w-12 h-12 border-4 border-orange-500 border-t-transparent border-solid rounded-full animate-spin mb-4"></div><p>Loading application...</p></div></div>';
+    showLoader();
 
     try {
         const res = await fetch('/api/form-config');
-        if (res.ok) {
-            const config = await res.json();
+        if (!res.ok) throw new Error('Config load failed');
+        const config = await res.json();
 
-            // Reconstruct flow with welcome/success wrappers
-            flow = [
-                {
-                    id: 'welcome',
-                    type: 'info',
-                    title: 'Drive Your Future With Us',
-                    subtitle: 'Apply in 2 minutes. No resume needed to start.',
-                    buttonText: 'Start Application'
-                },
-                ...config,
-                {
-                    id: 'success',
-                    type: 'success',
-                    title: 'Application Submitted',
-                    subtitle: 'Our team will contact you shortly.'
-                }
-            ];
+        // Build flat flow with welcome/success bookmarks
+        const rawFlow = [
+            { id: '__welcome__', type: 'welcome', title: 'Drive Your Future With Us', subtitle: 'Apply in a few steps. Fast, honest, and straightforward.', buttonText: 'Start Application' },
+            ...config,
+            { id: '__success__', type: 'success', title: 'Application Submitted!', subtitle: 'Our recruiting team will reach out within 3–5 business days.' }
+        ];
 
-            // Enhance configs with validation if missing 
-            flow.forEach(step => {
-                if (step.type === 'email' && !step.validation) {
-                    step.validation = (val) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-                } else if (step.type === 'tel' && !step.validation) {
-                    step.validation = (val) => val.replace(/\D/g, '').length >= 10;
-                }
-            });
+        // Add email/tel validations
+        rawFlow.forEach(step => {
+            if (step.type === 'email' && !step.validation)
+                step.validation = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+            if (step.type === 'tel' && !step.validation)
+                step.validation = v => v.replace(/\D/g, '').length >= 10;
+        });
 
-            renderStep(state.currentIndex);
-            setupEventListeners();
-        } else {
-            appEl.innerHTML = '<p class="text-red-400">Failed to load configuration.</p>';
-        }
-    } catch (error) {
-        console.error("Configuration error", error);
-        appEl.innerHTML = '<p class="text-red-400">Error connecting to server. Please try again later.</p>';
+        // Group into segments
+        state.segments = buildSegments(rawFlow);
+        state.segmentIndex = 0;
+
+        renderSegment(state.segmentIndex, 'enter-up');
+        bindGlobalEvents();
+
+    } catch (err) {
+        console.error(err);
+        showError401();
     }
 });
 
-function setupEventListeners() {
-    btnUp.addEventListener('click', () => {
-        if (!state.isTransitioning) goPrevious();
-    });
+// ── Segment builder ──────────────────────────────────────────────────────────
+/**
+ * Groups consecutive 'page' display_mode questions into single page segments.
+ * 'single' display_mode questions become individual segments (Typeform).
+ * welcome/success become their own segment types.
+ */
+function buildSegments(flow) {
+    const segments = [];
+    let pageBuffer = [];
 
-    btnDown.addEventListener('click', () => {
-        if (!state.isTransitioning) handleNext();
-    });
+    const flushPage = () => {
+        if (pageBuffer.length > 0) {
+            segments.push({ type: 'page', steps: [...pageBuffer] });
+            pageBuffer = [];
+        }
+    };
 
-    document.addEventListener('keydown', (e) => {
-        if (state.isTransitioning) return;
-
-        const step = flow[state.currentIndex];
-
-        if (e.key === 'Enter') {
-            e.preventDefault(); // Prevent default form submit or newline
-
-            // If it's a textarea and shift is held, allow newline
-            if (e.shiftKey && e.target.tagName.toLowerCase() === 'textarea') return;
-
-            // For option types, Enter selects and goes next if something is focused, 
-            // otherwise just try to go next (which will validate)
-            if (step.type === 'options') {
-                const selected = state.answers[step.id];
-                if (selected) {
-                    handleNext();
-                } else {
-                    showError(step.errorMessage);
-                }
-            } else if (step.type === 'info' || step.type === 'success') {
-                if (step.type !== 'success') handleNext();
+    flow.forEach(step => {
+        if (step.type === 'welcome') {
+            flushPage();
+            segments.push({ type: 'welcome', steps: [step] });
+        } else if (step.type === 'success') {
+            flushPage();
+            segments.push({ type: 'success', steps: [step] });
+        } else {
+            const mode = step.display_mode || 'single';
+            if (mode === 'page') {
+                pageBuffer.push(step);
             } else {
-                handleNext();
+                flushPage();
+                segments.push({ type: 'single', steps: [step] });
             }
-        } else if (e.key === 'ArrowUp' && document.activeElement.tagName !== 'INPUT') {
-            goPrevious();
-        } else if (e.key === 'ArrowDown' && document.activeElement.tagName !== 'INPUT') {
-            // handleNext(); // Might be confusing for users trying to scroll
         }
     });
+
+    flushPage();
+    return segments;
 }
 
-function updateProgress() {
-    if (state.currentIndex === 0 || state.currentIndex === flow.length - 1) {
-        progressContainer.style.opacity = '0';
-        controlsContainer.style.opacity = '0';
-    } else {
-        progressContainer.style.opacity = '1';
-        controlsContainer.style.opacity = '1';
-        const calculableSteps = flow.length - 2; // Exclude info and success
-        const progress = ((state.currentIndex) / calculableSteps) * 100;
-        progressBar.style.width = `${Math.min(progress, 100)}%`;
-    }
+// ── Render segment ───────────────────────────────────────────────────────────
+function renderSegment(index, animation = 'enter-up') {
+    const seg = state.segments[index];
+    if (!seg) return;
 
-    btnUp.disabled = state.currentIndex <= 1;
-    btnDown.disabled = state.currentIndex === flow.length - 1;
+    hideSingleView();
+    hidePageView();
+
+    updateProgress(index);
+
+    if (seg.type === 'welcome') renderWelcome(seg.steps[0], animation);
+    else if (seg.type === 'success') renderSuccess(seg.steps[0], animation);
+    else if (seg.type === 'single') renderSingle(seg.steps[0], animation);
+    else if (seg.type === 'page') renderPage(seg.steps, animation);
 }
 
-function handleNext() {
-    const step = flow[state.currentIndex];
+// ── Welcome screen ───────────────────────────────────────────────────────────
+function renderWelcome(step, anim) {
+    showSingleView();
+    singleView.innerHTML = '';
 
-    if (step.type === 'info') {
-        goNext();
-        return;
-    }
+    const div = document.createElement('div');
+    div.className = `welcome-screen ${anim === 'enter-up' ? 'slide-enter-up' : 'slide-enter-down'}`;
+    div.innerHTML = `
+        <p style="font-size:0.7rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#555;margin-bottom:1.25rem;">N&Z Logistics LLC — Careers</p>
+        <h1 style="font-family:'Syne','Inter',sans-serif;font-size:clamp(2.5rem,7vw,5.5rem);font-weight:800;letter-spacing:-0.035em;line-height:1.05;margin-bottom:1.5rem;color:#f2f2f2;">
+            ${step.title}
+        </h1>
+        <p style="font-size:1.1rem;color:#666;margin-bottom:3rem;max-width:520px;line-height:1.6;">${step.subtitle}</p>
+        <button id="welcome-btn" class="btn-white" style="font-size:1.05rem;padding:1rem 2.5rem;">
+            ${step.buttonText}
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+        <p style="font-size:0.7rem;color:#444;margin-top:1.25rem;">Takes about 5 minutes &nbsp;·&nbsp; No resume required to start</p>
+    `;
 
-    if (step.type === 'success') return; // Can't go next from success
+    singleView.appendChild(div);
+    div.querySelector('#welcome-btn').addEventListener('click', goNext);
+}
 
-    // Validate
-    let value = state.answers[step.id];
+// ── Success screen ───────────────────────────────────────────────────────────
+function renderSuccess(step, anim) {
+    showSingleView();
+    singleView.innerHTML = '';
 
-    // Auto-capture input value if not captured yet (especially for text/number that didn't fire 'change')
-    if (step.type !== 'options') {
-        const inputEl = document.getElementById(`input-${step.id}`);
-        if (inputEl) {
-            value = inputEl.value.trim();
-            state.answers[step.id] = value;
+    const div = document.createElement('div');
+    div.className = `success-screen ${anim === 'enter-up' ? 'slide-enter-up' : 'slide-enter-down'}`;
+    div.style.textAlign = 'center';
+    div.innerHTML = `
+        <div style="width:64px;height:64px;margin:0 auto 2rem;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;box-shadow:0 0 40px rgba(255,255,255,0.2);">
+            <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        <h2 style="font-family:'Syne','Inter',sans-serif;font-size:clamp(2rem,5vw,3.5rem);font-weight:800;letter-spacing:-0.03em;margin-bottom:1rem;">${step.title}</h2>
+        <p style="color:#666;font-size:1rem;margin-bottom:3rem;max-width:440px;margin-left:auto;margin-right:auto;">${step.subtitle}</p>
+        <a href="/" class="btn-white" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;">
+            Return to Home
+        </a>
+    `;
+
+    singleView.appendChild(div);
+    // Trigger submission here
+    submitApplication(state.answers);
+}
+
+// ── Single question (Typeform style) ─────────────────────────────────────────
+function renderSingle(step, anim) {
+    showSingleView();
+    singleView.innerHTML = '';
+
+    const stepNum = getStepNumberForStep(step.id);
+    const totalQ = countQuestions();
+
+    const div = document.createElement('div');
+    div.className = `single-step ${anim === 'enter-up' ? 'slide-enter-up' : 'slide-enter-down'}`;
+    div.dataset.stepId = step.id;
+
+    div.innerHTML = `
+        <div class="q-label">
+            <span class="q-num">${stepNum}</span>
+            of ${totalQ}
+        </div>
+        <h2 class="single-title">${step.title}${step.required ? ' <span style="color:#555;font-size:0.5em;font-weight:400;">*required</span>' : ''}</h2>
+        <div class="input-wrapper">
+            ${getSingleInputHTML(step)}
+        </div>
+        <div class="error-msg" id="single-error"></div>
+        ${step.type !== 'options' ? `
+        <div style="margin-top:1.5rem;display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+            <button class="btn-white" id="single-ok" type="button" style="font-size:0.9rem;padding:0.75rem 1.75rem;">
+                OK
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </button>
+            <span class="key-hint">press <kbd>Enter ↵</kbd></span>
+        </div>` : ''}
+    `;
+
+    singleView.appendChild(div);
+    bindSingleStep(div, step);
+
+    // Restore answer
+    if (state.answers[step.id]) {
+        if (step.type === 'options') {
+            div.querySelectorAll('.option-btn').forEach(b => {
+                if (b.dataset.value === state.answers[step.id]) b.classList.add('selected');
+            });
+        } else {
+            const inp = div.querySelector('input');
+            if (inp) { inp.value = state.answers[step.id]; inp.focus(); }
         }
+    } else if (step.type !== 'options') {
+        const inp = div.querySelector('input');
+        if (inp) inp.focus();
+    }
+}
+
+function getSingleInputHTML(step) {
+    const val = state.answers[step.id] || '';
+
+    if (step.type === 'options') {
+        return `
+            <div class="options-grid" style="max-width:520px;">
+                ${(step.options || []).map((opt, i) => `
+                    <button class="option-btn ${val === opt ? 'selected' : ''}" type="button" data-value="${escHtml(opt)}">
+                        <span class="option-num">${i + 1}</span>
+                        ${escHtml(opt)}
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    const typeMap = { email: 'email', tel: 'tel', number: 'number', text: 'text' };
+    const itype = typeMap[step.type] || 'text';
+    return `
+        <input
+            type="${itype}"
+            class="single-input"
+            id="input-${step.id}"
+            placeholder="${escHtml(step.placeholder || 'Type your answer...')}"
+            value="${escHtml(val)}"
+            autocomplete="off"
+            ${step.type === 'number' ? 'min="0"' : ''}
+        >
+    `;
+}
+
+function bindSingleStep(container, step) {
+    if (step.type === 'options') {
+        container.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                container.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                state.answers[step.id] = btn.dataset.value;
+                hideSingleError();
+                setTimeout(() => validateAndAdvance(step, container), 350);
+            });
+        });
+    } else {
+        const inp = container.querySelector('input');
+        if (inp) {
+            inp.addEventListener('input', e => {
+                state.answers[step.id] = e.target.value;
+                hideSingleError();
+            });
+            if (step.type === 'tel') applyPhoneFormat(inp);
+        }
+        const okBtn = container.querySelector('#single-ok');
+        if (okBtn) okBtn.addEventListener('click', () => validateAndAdvance(step, container));
+    }
+}
+
+// ── Page group (Google Form style) ───────────────────────────────────────────
+function renderPage(steps, anim) {
+    showPageView();
+    pageForm.innerHTML = '';
+
+    const totalO = countQuestions();
+    const firstNum = getStepNumberForStep(steps[0].id);
+
+    // Header card
+    const header = document.createElement('div');
+    header.className = 'form-card';
+    header.style.cssText = 'background:#0f0f0f;border-color:#1f1f1f;';
+    header.innerHTML = `
+        <p style="font-size:0.65rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#444;margin-bottom:0.5rem;">Questions ${firstNum}–${Math.min(firstNum + steps.length - 1, totalO)} of ${totalO}</p>
+        <div style="height:2px;background:#1a1a1a;border-radius:2px;overflow:hidden;margin-top:0.75rem;">
+            <div style="height:100%;width:${(firstNum / totalO) * 100}%;background:#fff;box-shadow:0 0 12px rgba(255,255,255,0.4);transition:width 0.5s;border-radius:2px;"></div>
+        </div>
+    `;
+    pageForm.appendChild(header);
+
+    // Question cards
+    steps.forEach((step, i) => {
+        const card = document.createElement('div');
+        card.className = 'form-card';
+        card.dataset.stepId = step.id;
+
+        const num = firstNum + i;
+        card.innerHTML = `
+            <div class="q-label">
+                <span class="q-num">${num}</span>
+                of ${totalO}
+                ${step.required ? '<span style="color:#f87171;margin-left:0.25rem;">*</span>' : ''}
+            </div>
+            <p class="page-q-title">${step.title}</p>
+            <div class="input-wrapper">
+                ${getPageInputHTML(step)}
+            </div>
+            <div class="error-msg" id="error-${step.id}"></div>
+        `;
+
+        pageForm.appendChild(card);
+        bindPageStep(card, step);
+
+        // Restore answers
+        if (state.answers[step.id]) {
+            if (step.type === 'options') {
+                card.querySelectorAll('.option-btn').forEach(b => {
+                    if (b.dataset.value === state.answers[step.id]) b.classList.add('selected');
+                });
+            } else {
+                const inp = card.querySelector('input, select, textarea');
+                if (inp) inp.value = state.answers[step.id];
+            }
+        }
+    });
+
+    // Animate in
+    if (anim === 'enter-up') {
+        pageForm.classList.remove('page-slide-exit');
+        pageForm.classList.add('page-slide-enter');
+        setTimeout(() => pageForm.classList.remove('page-slide-enter'), 500);
+    }
+
+    // Update page button labels
+    const isLastSeg = state.segmentIndex === state.segments.length - 2; // exclude success
+    pageNextBtn.textContent = isLastSeg ? 'Submit Application' : 'Continue';
+    if (isLastSeg) {
+        pageNextBtn.innerHTML = `Submit Application <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>`;
+    } else {
+        pageNextBtn.innerHTML = `Continue <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>`;
+    }
+
+    const canGoBack = state.segmentIndex > 0 && state.segments[state.segmentIndex - 1]?.type !== 'welcome';
+    pageBackBtn.style.display = canGoBack ? 'inline-flex' : 'none';
+
+    pageSubmitBar.classList.add('active');
+}
+
+function getPageInputHTML(step) {
+    const val = state.answers[step.id] || '';
+
+    if (step.type === 'options') {
+        return `
+            <div class="options-grid">
+                ${(step.options || []).map((opt, i) => `
+                    <button class="option-btn ${val === opt ? 'selected' : ''}" type="button" data-value="${escHtml(opt)}" style="font-size:0.925rem;padding:0.75rem 1rem;">
+                        <span class="option-num" style="font-size:0.6rem;width:18px;height:18px;">${i + 1}</span>
+                        ${escHtml(opt)}
+                    </button>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    const typeMap = { email: 'email', tel: 'tel', number: 'number', text: 'text' };
+    const itype = typeMap[step.type] || 'text';
+    return `
+        <input
+            type="${itype}"
+            class="page-input"
+            id="input-${step.id}"
+            placeholder="${escHtml(step.placeholder || '')}"
+            value="${escHtml(val)}"
+            autocomplete="off"
+            ${step.type === 'number' ? 'min="0"' : ''}
+        >
+    `;
+}
+
+function bindPageStep(container, step) {
+    if (step.type === 'options') {
+        container.querySelectorAll('.option-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                container.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                state.answers[step.id] = btn.dataset.value;
+                hidePageError(step.id);
+            });
+        });
+    } else {
+        const inp = container.querySelector('input');
+        if (inp) {
+            inp.addEventListener('input', e => {
+                state.answers[step.id] = e.target.value;
+                hidePageError(step.id);
+            });
+            if (step.type === 'tel') applyPhoneFormat(inp);
+        }
+    }
+}
+
+// ── Validate and advance (single-view) ───────────────────────────────────────
+function validateAndAdvance(step, container) {
+    let value = state.answers[step.id];
+    if (step.type !== 'options') {
+        const inp = container.querySelector(`#input-${step.id}`);
+        if (inp) { value = inp.value.trim(); state.answers[step.id] = value; }
     }
 
     if (step.required && (!value || value === '')) {
-        showError(step.errorMessage);
+        showSingleError(step.errorMessage || 'This field is required.');
+        shakeInput(container);
         return;
     }
-
     if (step.validation && !step.validation(value)) {
-        showError(step.errorMessage);
+        showSingleError(step.errorMessage || 'Please enter a valid value.');
+        shakeInput(container);
         return;
     }
 
-    // Hide error if any
-    hideError();
-
+    hideSingleError();
     goNext();
 }
 
+// ── Validate page segment ─────────────────────────────────────────────────────
+function validatePageSegment() {
+    const seg = state.segments[state.segmentIndex];
+    let allValid = true;
+
+    for (const step of seg.steps) {
+        let value = state.answers[step.id];
+        if (step.type !== 'options') {
+            const inp = pageForm.querySelector(`#input-${step.id}`);
+            if (inp) { value = inp.value.trim(); state.answers[step.id] = value; }
+        }
+
+        if (step.required && (!value || value === '')) {
+            showPageError(step.id, step.errorMessage || 'This field is required.');
+            if (allValid) {
+                // Scroll to first error
+                const errCard = pageForm.querySelector(`[data-step-id="${step.id}"]`);
+                if (errCard) errCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            allValid = false;
+        } else if (step.validation && !step.validation(value)) {
+            showPageError(step.id, step.errorMessage || 'Please enter a valid value.');
+            allValid = false;
+        } else {
+            hidePageError(step.id);
+        }
+    }
+
+    return allValid;
+}
+
+// ── Navigation ───────────────────────────────────────────────────────────────
 function goNext() {
-    if (state.currentIndex < flow.length - 1) {
-        transitionTo(state.currentIndex + 1, 'up');
+    if (state.isTransitioning) return;
+    const seg = state.segments[state.segmentIndex];
+    if (seg.type === 'page' && !validatePageSegment()) return;
+
+    if (state.segmentIndex < state.segments.length - 1) {
+        doTransition(state.segmentIndex + 1, 'enter-up');
     }
 }
 
 function goPrevious() {
-    if (state.currentIndex > 0 && flow[state.currentIndex].type !== 'success') {
-        transitionTo(state.currentIndex - 1, 'down');
-    }
+    if (state.isTransitioning || state.segmentIndex <= 0) return;
+    const prevSeg = state.segments[state.segmentIndex - 1];
+    if (prevSeg?.type === 'welcome') return;
+    doTransition(state.segmentIndex - 1, 'enter-down');
 }
 
-function transitionTo(nextIndex, direction = 'up') {
+function doTransition(nextIndex, anim) {
     state.isTransitioning = true;
+    state.segmentIndex = nextIndex;
+    renderSegment(nextIndex, anim);
+    requestAnimationFrame(() => {
+        state.isTransitioning = false;
+    });
+}
 
-    const currentEl = document.querySelector('.step-container');
-    const nextStep = flow[nextIndex];
-    const nextEl = createStepElement(nextStep);
+// ── Progress ─────────────────────────────────────────────────────────────────
+function updateProgress(segIdx) {
+    const seg = state.segments[segIdx];
+    const isEdge = seg.type === 'welcome' || seg.type === 'success';
 
-    appEl.appendChild(nextEl);
+    progressTrack.style.opacity = isEdge ? '0' : '1';
+    stepCounter.style.opacity = isEdge ? '0' : '1';
+    controls.style.opacity = isEdge ? '0' : '1';
 
-    // Prepare for animation
-    if (currentEl) {
-        // Exit animation
-        requestAnimationFrame(() => {
-            currentEl.style.transition = 'opacity 400ms ease, transform 400ms ease';
-            currentEl.style.opacity = '0';
-            currentEl.style.transform = direction === 'up' ? 'translateY(-40px)' : 'translateY(40px)';
-        });
+    if (!isEdge) {
+        // Compute question progress
+        const total = state.segments.length - 2; // exclude welcome + success
+        const progress = ((segIdx) / total) * 100;
+        progressFill.style.width = `${Math.min(progress, 100)}%`;
+
+        const curSeg = state.segments[segIdx];
+        const firstStep = curSeg.steps[0];
+        const stepNum = getStepNumberForStep(firstStep.id);
+        stepCounter.textContent = `${stepNum} / ${countQuestions()}`;
     }
 
-    // Enter animation for next
-    nextEl.style.opacity = '0';
-    nextEl.style.transform = direction === 'up' ? 'translateY(40px)' : 'translateY(-40px)';
-    nextEl.style.transition = 'opacity 400ms ease, transform 400ms ease';
+    // Arrow buttons (single view only)
+    btnUp.disabled = segIdx <= 1;
+    btnDown.disabled = segIdx >= state.segments.length - 1;
+}
 
-    // Force reflow
-    void nextEl.offsetWidth;
+// ── View switcher ─────────────────────────────────────────────────────────────
+function showSingleView() {
+    singleView.classList.add('active');
+    pageView.classList.remove('active');
+    pageSubmitBar.classList.remove('active');
+    controls.style.display = 'flex';
+}
+function showPageView() {
+    pageView.classList.add('active');
+    singleView.classList.remove('active');
+    controls.style.display = 'none';
+}
+function hideSingleView() { singleView.classList.remove('active'); }
+function hidePageView() {
+    pageView.classList.remove('active');
+    pageSubmitBar.classList.remove('active');
+}
 
-    requestAnimationFrame(() => {
-        nextEl.style.opacity = '1';
-        nextEl.style.transform = 'translateY(0)';
+// ── Global keyboard events ────────────────────────────────────────────────────
+function bindGlobalEvents() {
+    btnUp.addEventListener('click', goPrevious);
+    btnDown.addEventListener('click', () => {
+        const seg = state.segments[state.segmentIndex];
+        if (seg.type === 'single') {
+            validateAndAdvance(seg.steps[0], singleView);
+        } else {
+            goNext();
+        }
     });
 
-    setTimeout(() => {
-        if (currentEl) currentEl.remove();
-        state.currentIndex = nextIndex;
-        updateProgress();
-        state.isTransitioning = false;
+    pageNextBtn.addEventListener('click', goNext);
+    pageBackBtn.addEventListener('click', goPrevious);
 
-        // Focus new input if exists
-        const newInput = nextEl.querySelector('input, button');
-        if (newInput && nextStep.type !== 'info' && nextStep.type !== 'success') {
-            newInput.focus();
+    document.addEventListener('keydown', e => {
+        if (state.isTransitioning) return;
+        const seg = state.segments[state.segmentIndex];
+        if (!seg) return;
+
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (seg.type === 'welcome') goNext();
+            else if (seg.type === 'single') validateAndAdvance(seg.steps[0], singleView);
+            // page: don't auto-advance on Enter to let user fill multiple fields
         }
-
-        // If it's the success screen, call submit Application
-        if (nextStep.type === 'success') {
-            submitApplication(state.answers);
-        }
-
-    }, 400); // match transition duration
+    });
 }
 
-function renderStep(index) {
-    appEl.innerHTML = '';
-    const step = flow[index];
-    const el = createStepElement(step);
-    appEl.appendChild(el);
-    updateProgress();
-
-    // Force reflow and apply basic active state
-    void el.offsetWidth;
-    el.style.opacity = '1';
-    el.style.transform = 'translateY(0)';
+// ── Error helpers ─────────────────────────────────────────────────────────────
+function showSingleError(msg) {
+    const el = document.getElementById('single-error');
+    if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+function hideSingleError() {
+    const el = document.getElementById('single-error');
+    if (el) el.classList.remove('show');
+}
+function showPageError(stepId, msg) {
+    const el = document.getElementById(`error-${stepId}`);
+    if (el) { el.textContent = msg; el.classList.add('show'); }
+}
+function hidePageError(stepId) {
+    const el = document.getElementById(`error-${stepId}`);
+    if (el) el.classList.remove('show');
+}
+function shakeInput(container) {
+    const w = container.querySelector('.input-wrapper');
+    if (!w) return;
+    w.animate([
+        { transform: 'translateX(0)' }, { transform: 'translateX(-8px)' },
+        { transform: 'translateX(8px)' }, { transform: 'translateX(-8px)' },
+        { transform: 'translateX(0)' }
+    ], { duration: 320, easing: 'ease-in-out' });
 }
 
-function createStepElement(step) {
-    const container = document.createElement('div');
-    container.className = 'step-container w-full h-full flex flex-col justify-center max-w-2xl mx-auto px-4';
-
-    let innerHTML = '';
-
-    if (step.type === 'info') {
-        innerHTML = `
-            <div class="text-left">
-                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-white leading-tight">
-                    ${step.title.split(' ').map(word =>
-            word === 'Us' ? `<span class="text-orange-500">${word}</span>` : word
-        ).join(' ')}
-                </h1>
-                <p class="text-xl md:text-2xl text-gray-400 mb-12 font-medium">${step.subtitle}</p>
-                <button id="btn-start" class="btn-accent text-lg px-8 py-4 w-auto rounded-full shadow-[0_0_20px_rgba(234,88,12,0.4)] hover:shadow-[0_0_30px_rgba(234,88,12,0.6)] group">
-                    ${step.buttonText}
-                    <svg class="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                </button>
-            </div>
-        `;
-    } else if (step.type === 'success') {
-        innerHTML = `
-            <div class="text-center flex flex-col items-center justify-center">
-                <div class="w-24 h-24 mb-8 text-green-400">
-                    <svg class="w-full h-full drop-shadow-[0_0_15px_rgba(74,222,128,0.5)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </div>
-                <h2 class="text-4xl md:text-5xl font-bold mb-4">${step.title}</h2>
-                <p class="text-xl text-gray-400 mb-10">${step.subtitle}</p>
-                <a href="/" class="btn-primary text-lg px-8 py-3 w-auto rounded-full shadow-[0_0_15px_rgba(255,255,255,0.1)] hover:shadow-[0_0_25px_rgba(255,255,255,0.2)]">
-                    Return to Home
-                </a>
-            </div>
-        `;
-    } else {
-        innerHTML = `
-            <div class="w-full">
-                <div class="mb-2 text-orange-500 font-semibold text-sm flex items-center gap-2">
-                    <span class="flex items-center justify-center w-6 h-6 rounded-full bg-orange-500/20 text-xs">${state.currentIndex}</span>
-                </div>
-                <h2 class="text-3xl md:text-5xl font-bold mb-8 text-white leading-tight">${step.title}</h2>
-                
-                <div class="input-wrapper mb-6 w-full">
-                    ${getInputHTML(step)}
-                </div>
-                
-                <div id="error-msg" class="text-red-400 text-sm h-6 opacity-0 transition-opacity"></div>
-            </div>
-        `;
-    }
-
-    container.innerHTML = innerHTML;
-
-    // Bind specific events
-    if (step.type === 'info') {
-        const btn = container.querySelector('#btn-start');
-        btn.addEventListener('click', handleNext);
-    } else if (step.type !== 'success') {
-        const wrapper = container.querySelector('.input-wrapper');
-
-        if (step.type === 'options') {
-            const btns = wrapper.querySelectorAll('.option-btn');
-            btns.forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    // Remove selected from all
-                    btns.forEach(b => b.classList.remove('selected'));
-                    // Add to clicked
-                    const target = e.currentTarget;
-                    target.classList.add('selected');
-                    // Save and advance automatically after small delay
-                    state.answers[step.id] = target.dataset.value;
-                    hideError();
-                    setTimeout(handleNext, 300);
-                });
-            });
-        } else {
-            const input = wrapper.querySelector('input');
-            input.addEventListener('input', (e) => {
-                state.answers[step.id] = e.target.value;
-                hideError(); // Clear error on typing
-            });
-            // Auto format phone
-            if (step.type === 'tel') {
-                input.addEventListener('input', function (e) {
-                    var x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-                    e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
-                });
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function countQuestions() {
+    return state.segments.filter(s => s.type === 'single' || s.type === 'page')
+        .reduce((acc, s) => acc + s.steps.length, 0);
+}
+function getStepNumberForStep(stepId) {
+    let num = 1;
+    for (const seg of state.segments) {
+        if (seg.type === 'single' || seg.type === 'page') {
+            for (const step of seg.steps) {
+                if (step.id === stepId) return num;
+                num++;
             }
         }
     }
-
-    return container;
+    return num;
 }
-
-function getInputHTML(step) {
-    const value = state.answers[step.id] || '';
-
-    if (step.type === 'options') {
-        return `
-            <div class="flex flex-col gap-4 max-w-md">
-                ${step.options.map(opt => `
-                    <button class="option-btn text-xl md:text-2xl py-4 hover:translate-x-2 ${value === opt ? 'selected' : ''}" data-value="${opt}">
-                        <span class="inline-block w-8 text-gray-500 text-base font-normal mr-2">${step.options.indexOf(opt) + 1}</span>
-                        ${opt}
-                    </button>
-                `).join('')}
-            </div>
-            <div class="key-hint mt-6">
-                Press enter to confirm or click
-            </div>
-        `;
-    }
-
-    let inputType = step.type === 'number' ? 'number' : step.type === 'tel' ? 'tel' : step.type === 'email' ? 'email' : 'text';
-
-    return `
-        <input 
-            type="${inputType}" 
-            id="input-${step.id}"
-            class="input-field max-w-2xl bg-transparent font-medium border-b-2 border-gray-700 outline-none text-3xl md:text-5xl py-4 text-orange-400 placeholder:text-gray-700 w-full hover:border-gray-500 focus:border-orange-500 transition-colors"
-            placeholder="${step.placeholder || 'Type your answer here...'}"
-            value="${value}"
-            ${step.type === 'number' ? 'min="0"' : ''}
-            autocomplete="off"
-        >
-        <div class="key-hint mt-6 hidden md:flex">
-            Press <kbd>Enter ↵</kbd>
+function applyPhoneFormat(input) {
+    input.addEventListener('input', function () {
+        const x = this.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+        this.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+    });
+}
+function escHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function showLoader() {
+    showSingleView();
+    singleView.classList.add('active');
+    singleView.innerHTML = `
+        <div style="text-align:center;color:#444;display:flex;flex-direction:column;align-items:center;gap:1rem;">
+            <div class="spinner"></div>
+            <p style="font-size:0.85rem;">Loading application...</p>
+        </div>
+    `;
+}
+function showError401() {
+    showSingleView();
+    singleView.innerHTML = `
+        <div style="text-align:center;color:#f87171;">
+            <p style="font-size:1rem;font-weight:600;">Failed to load the application form.</p>
+            <p style="font-size:0.85rem;color:#666;margin-top:0.5rem;">Please try refreshing the page.</p>
         </div>
     `;
 }
 
-function showError(msg) {
-    const errorEl = document.querySelector('.step-container #error-msg');
-    if (errorEl) {
-        errorEl.textContent = msg;
-        errorEl.style.opacity = '1';
-
-        // Shake effect on input or options
-        const activeContainer = document.querySelector('.step-container .input-wrapper');
-        if (activeContainer) {
-            activeContainer.animate([
-                { transform: 'translateX(0)' },
-                { transform: 'translateX(-10px)' },
-                { transform: 'translateX(10px)' },
-                { transform: 'translateX(-10px)' },
-                { transform: 'translateX(10px)' },
-                { transform: 'translateX(0)' }
-            ], { duration: 400, easing: 'ease-in-out' });
-        }
-    }
-}
-
-function hideError() {
-    const errorEl = document.querySelector('.step-container #error-msg');
-    if (errorEl) {
-        errorEl.style.opacity = '0';
-    }
-}
-
-// ==========================================
-// Integrations
-// ==========================================
-
-/**
- * Backend Team: Connect your API / Supabase here.
- * This function is called seamlessly at the end of the flow.
- */
+// ── Submit ─────────────────────────────────────────────────────────────────────
 function submitApplication(data) {
-    console.log("=== SUBMITTING APPLICATION DATA TO SQLITE ===");
-
-    // Add loading text to the success screen
-    const subtitleEl = document.querySelector('.step-container p');
-    if (subtitleEl) {
-        subtitleEl.textContent = 'Saving your application...';
-        subtitleEl.classList.add('animate-pulse');
-    }
-
     fetch('/api/submit-application', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-        .then(res => res.json())
-        .then(res => {
-            if (subtitleEl) {
-                subtitleEl.classList.remove('animate-pulse');
-                if (res.success) {
-                    subtitleEl.textContent = 'Our team will contact you shortly.';
-                } else {
-                    subtitleEl.textContent = 'There was an issue saving your application, but you can return to home.';
-                    subtitleEl.classList.add('text-red-400');
-                }
-            }
+        .then(r => r.json())
+        .then(r => {
+            const p = document.querySelector('.success-screen p');
+            if (p) p.textContent = r.success
+                ? 'Our team will contact you within 3–5 business days.'
+                : 'There was an issue saving your application. Please email us directly.';
         })
-        .catch(err => {
-            console.error('Submission failed:', err);
-            if (subtitleEl) {
-                subtitleEl.classList.remove('animate-pulse');
-                subtitleEl.textContent = 'Network error saving your application.';
-                subtitleEl.classList.add('text-red-400');
-            }
+        .catch(() => {
+            const p = document.querySelector('.success-screen p');
+            if (p) p.textContent = 'Network error — please email us directly at nzlogisticsllc@gmail.com';
         });
 }

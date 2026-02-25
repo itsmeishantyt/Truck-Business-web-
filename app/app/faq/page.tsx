@@ -16,15 +16,15 @@ const faqs = [
     },
     {
         q: 'How do I submit my application?',
-        a: 'Click "Apply Now" on any page to reach our application form. Fill in your details, upload your resume as a PDF (max 5 MB), and hit submit. You\'ll receive a confirmation once we\'ve received it.',
+        a: "Click \"Apply Now\" on any page to reach our application form. Fill in your details, upload your resume as a PDF (max 5 MB), and hit submit. You'll receive a confirmation once we've received it.",
     },
     {
         q: 'How long does the hiring process take?',
-        a: 'Our recruiting team reviews all applications within 3–5 business days. If shortlisted, you\'ll be contacted for a phone screen, followed by a final interview.',
+        a: "Our recruiting team reviews all applications within 3–5 business days. If shortlisted, you'll be contacted for a phone screen, followed by a final interview.",
     },
     {
         q: 'What documents do I need to apply?',
-        a: 'For the online application, you only need your resume (PDF). If you progress to later stages, we\'ll request your CDL, driving record, and references at that point.',
+        a: "For the online application, you only need your resume (PDF). If you progress to later stages, we'll request your CDL, driving record, and references at that point.",
     },
     {
         q: 'Is there a file type requirement for my resume?',
@@ -42,25 +42,30 @@ const faqs = [
 
 export default function FAQPage() {
     return (
-        <div className="max-w-3xl mx-auto px-4 py-16">
-            <div className="text-center mb-12">
-                <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
-                    Frequently Asked <span className="text-orange-400">Questions</span>
+        <div className="max-w-3xl mx-auto px-4 py-16 md:py-24">
+
+            {/* Header */}
+            <div className="text-center mb-12 relative">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.04),transparent_70%)] pointer-events-none" />
+                <span className="eyebrow mb-4">Support</span>
+                <h1 className="section-heading text-4xl md:text-5xl mt-4 mb-4 text-[var(--color-text)]">
+                    Frequently Asked <span className="gradient-text">Questions</span>
                 </h1>
                 <p className="text-[var(--color-muted)] text-lg max-w-xl mx-auto">
                     Everything you need to know about applying for a position at N&Z Logistics LLC.
                 </p>
             </div>
 
-            <div className="space-y-4" id="faq-list">
+            {/* FAQ list */}
+            <div className="space-y-3" id="faq-list">
                 {faqs.map((faq, i) => (
                     <details
                         key={i}
-                        className="card group open:border-orange-500/40 transition-all duration-200 cursor-pointer"
+                        className="card group open:border-[var(--color-border-strong)] open:shadow-[0_0_20px_rgba(255,255,255,0.03)] transition-all duration-200 cursor-pointer"
                     >
-                        <summary className="flex items-center justify-between font-semibold text-[var(--color-text)] list-none py-1 select-none">
+                        <summary className="flex items-center justify-between font-semibold text-[var(--color-text)] list-none py-1 select-none gap-4">
                             <span>{faq.q}</span>
-                            <span className="ml-4 shrink-0 w-6 h-6 rounded-full bg-[var(--color-surface2)] flex items-center justify-center text-orange-400 text-sm transition-transform group-open:rotate-45">
+                            <span className="shrink-0 w-6 h-6 rounded-full bg-[var(--color-surface3)] border border-[var(--color-border)] flex items-center justify-center text-[var(--color-muted)] text-sm transition-transform group-open:rotate-45">
                                 +
                             </span>
                         </summary>
@@ -72,16 +77,15 @@ export default function FAQPage() {
             </div>
 
             {/* CTA */}
-            <div className="mt-12 card text-center bg-gradient-to-br from-orange-900/20 to-slate-800 border-orange-500/20">
-                <p className="text-[var(--color-text)] font-semibold mb-2">Still have questions?</p>
-                <p className="text-[var(--color-muted)] text-sm mb-5">Our team is happy to help via email or phone.</p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <a href="/contact" className="btn-secondary text-sm">
-                        Contact Us
-                    </a>
-                    <a href="/apply-form/index.html" className="btn-primary text-sm">
-                        Apply Now →
-                    </a>
+            <div className="mt-10 card text-center relative overflow-hidden border-[var(--color-border-strong)]">
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.04),transparent_70%)]" />
+                <div className="relative z-10">
+                    <p className="text-[var(--color-text)] font-semibold mb-2">Still have questions?</p>
+                    <p className="text-[var(--color-muted)] text-sm mb-5">Our team is happy to help via email or phone.</p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <a href="/contact" className="btn-secondary text-sm">Contact Us</a>
+                        <a href="/apply-form/index.html" className="btn-primary text-sm">Apply Now →</a>
+                    </div>
                 </div>
             </div>
         </div>

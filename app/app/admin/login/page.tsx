@@ -31,9 +31,9 @@ export default function AdminLoginPage() {
             <div className="w-full max-w-sm">
                 {/* Logo */}
                 <div className="text-center mb-10">
-                    <span className="shrink-0 text-orange-400 mb-4 inline-block"><Truck className="w-16 h-16" /></span>
+                    <span className="text-[var(--color-text)] mb-4 inline-block opacity-60"><Truck className="w-12 h-12" /></span>
                     <h1 className="text-3xl font-bold text-[var(--color-text)] tracking-tight">
-                        Truck<span className="text-orange-400">Co</span> Admin
+                        N&Z Logistics Admin
                     </h1>
                     <p className="text-[var(--color-muted)] text-sm mt-1">Careers Dashboard</p>
                 </div>

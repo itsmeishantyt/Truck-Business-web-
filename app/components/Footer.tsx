@@ -35,7 +35,7 @@ export default function Footer() {
                     {/* Brand */}
                     <div>
                         <Link href="/" className="inline-flex mb-5 hover:opacity-80 transition-opacity hover:drop-shadow-[0_0_10px_rgba(255,255,255,0.25)]">
-                            <img src="/logo.webp" alt="N&Z Logistics LLC" className="h-10 w-auto" />
+                            <img src="/logo.svg" alt="N&Z Logistics LLC" className="h-10 w-auto dark:invert" />
                         </Link>
                         <p className="text-[var(--color-muted)] text-sm leading-relaxed max-w-xs">
                             Delivering excellence and opportunity across the nation. Built on trust, driven by experience.

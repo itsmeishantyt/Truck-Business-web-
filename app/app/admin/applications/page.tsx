@@ -43,7 +43,7 @@ export default async function AdminApplicationsPage({
             <header className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <span className="shrink-0 text-orange-400"><Truck className="w-8 h-8" /></span>
+                        <span className="shrink-0 text-[var(--color-text)]"><Truck className="w-8 h-8" /></span>
                         <div>
                             <h1 className="font-bold text-[var(--color-text)] text-lg leading-none">N&Z Logistics Admin</h1>
                             <p className="text-[var(--color-muted)] text-xs">Careers Dashboard</p>
@@ -77,7 +77,7 @@ export default async function AdminApplicationsPage({
                             key={f}
                             href={f === 'all' ? '/admin/applications' : `?status=${f}`}
                             className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-colors capitalize ${activeFilter === f
-                                ? 'border-orange-500/50 bg-orange-500/10 text-orange-400'
+                                ? 'border-[var(--color-border-strong)] bg-[var(--color-surface2)] text-[var(--color-text)] shadow-[0_0_10px_rgba(255,255,255,0.05)]'
                                 : 'border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)] hover:border-slate-500'
                                 }`}
                         >
@@ -139,7 +139,7 @@ export default async function AdminApplicationsPage({
                                             <td className="px-5 py-4">
                                                 <Link
                                                     href={`/admin/applications/${app.id}`}
-                                                    className="text-orange-400 hover:text-orange-300 font-medium transition-colors"
+                                                    className="text-[var(--color-text)] hover:drop-shadow-[0_0_6px_rgba(255,255,255,0.4)] transition-all font-medium"
                                                 >
                                                     View →
                                                 </Link>

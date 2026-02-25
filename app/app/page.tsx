@@ -46,9 +46,9 @@ export default function HomePage() {
           <div className="mb-10 relative">
             <div className="absolute inset-0 blur-3xl bg-white/10 rounded-full scale-150" />
             <img
-              src="/logo.webp"
+              src="/logo.svg"
               alt="N&Z Logistics LLC"
-              className="relative h-20 md:h-28 w-auto mx-auto dark:drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] drop-shadow-md hover:scale-[1.02] transition-transform duration-500"
+              className="relative h-20 md:h-28 w-auto mx-auto dark:invert dark:drop-shadow-[0_0_40px_rgba(255,255,255,0.15)] drop-shadow-md hover:scale-[1.02] transition-transform duration-500"
             />
           </div>
 

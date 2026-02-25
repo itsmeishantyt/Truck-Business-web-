@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "Join our team. Apply for open positions at N&Z Logistics LLC, a leading trucking and logistics company.",
   keywords: ["trucking jobs", "logistics careers", "truck driver jobs", "apply now"],
   icons: {
-    icon: '/logo.webp',
+    icon: '/logo.svg',
   }
 };
 

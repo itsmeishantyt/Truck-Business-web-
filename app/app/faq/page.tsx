@@ -79,7 +79,7 @@ export default function FAQPage() {
                     <a href="/contact" className="btn-secondary text-sm">
                         Contact Us
                     </a>
-                    <a href="/apply" className="btn-primary text-sm">
+                    <a href="/apply-form/index.html" className="btn-primary text-sm">
                         Apply Now →
                     </a>
                 </div>

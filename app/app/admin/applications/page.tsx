@@ -49,11 +49,14 @@ export default async function AdminApplicationsPage({
                             <p className="text-[var(--color-muted)] text-xs">Careers Dashboard</p>
                         </div>
                     </div>
-                    <form action={adminLogout}>
-                        <button type="submit" className="btn-secondary text-sm px-4 py-2">
-                            Sign Out
-                        </button>
-                    </form>
+                    <div className="flex items-center gap-4">
+                        <Link href="/admin/local-submissions" className="btn-secondary text-sm px-4 py-2 border border-gray-600 hover:border-gray-400">
+                            Local DB
+                        </Link>
+                        <Link href="/admin" className="btn-primary text-sm px-4 py-2 flex items-center gap-2">
+                            Form Builder
+                        </Link>
+                    </div>
                 </div>
             </header>
 

@@ -82,7 +82,7 @@ export default function AboutPage() {
             <div className="card text-center bg-gradient-to-br from-orange-900/20 to-slate-800 border-orange-500/20">
                 <h2 className="text-2xl font-bold text-[var(--color-text)] mb-3">Ready to join the team?</h2>
                 <p className="text-[var(--color-muted)] mb-6">We&apos;re always looking for hard-working, dedicated people.</p>
-                <Link href="/apply" className="btn-primary inline-flex">
+                <Link href="/apply-form/index.html" className="btn-primary inline-flex">
                     Apply Now →
                 </Link>
             </div>

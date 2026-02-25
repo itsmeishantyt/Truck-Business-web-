@@ -1,0 +1,78 @@
+[
+    {
+        "id": "fullName",
+        "type": "text",
+        "title": "What is your full name?",
+        "placeholder": "John Doe",
+        "required": true,
+        "errorMessage": "Please enter your full name."
+    },
+    {
+        "id": "phone",
+        "type": "tel",
+        "title": "What is your phone number?",
+        "placeholder": "(555) 000-0000",
+        "required": true,
+        "errorMessage": "Please enter a valid phone number (at least 10 digits)."
+    },
+    {
+        "id": "email",
+        "type": "email",
+        "title": "And your email address?",
+        "placeholder": "john@example.com",
+        "required": true,
+        "errorMessage": "Please enter a valid email address."
+    },
+    {
+        "id": "location",
+        "type": "text",
+        "title": "City / Current Location",
+        "placeholder": "e.g. Miami, FL",
+        "required": true,
+        "errorMessage": "Please enter your current location."
+    },
+    {
+        "id": "hasLicense",
+        "type": "options",
+        "title": "Do you have a valid Driving License?",
+        "options": [
+            "Yes",
+            "No"
+        ],
+        "required": true,
+        "errorMessage": "Please select an option."
+    },
+    {
+        "id": "vehicleType",
+        "type": "options",
+        "title": "Type of Vehicle You Drive",
+        "options": [
+            "Bike",
+            "Van",
+            "Truck",
+            "Other"
+        ],
+        "required": true,
+        "errorMessage": "Please select a vehicle type."
+    },
+    {
+        "id": "experience",
+        "type": "number",
+        "title": "Years of Driving Experience",
+        "placeholder": "e.g. 3",
+        "required": true,
+        "errorMessage": "Please enter your years of experience."
+    },
+    {
+        "id": "availability",
+        "type": "options",
+        "title": "Are you available Full Time or Part Time?",
+        "options": [
+            "Full Time",
+            "Part Time",
+            "Flexible"
+        ],
+        "required": true,
+        "errorMessage": "Please select your availability."
+    }
+]

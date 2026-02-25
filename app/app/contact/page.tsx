@@ -50,7 +50,7 @@ export default function ContactPage() {
                         The fastest way to get started is to fill out our online application form. Our
                         recruitment team reviews every application within 3–5 business days.
                     </p>
-                    <a href="/apply" className="btn-primary inline-flex">
+                    <a href="/apply-form/index.html" className="btn-primary inline-flex">
                         Go to Application Form →
                     </a>
                 </div>

@@ -1,57 +1,26 @@
 'use server';
 
-import { cookies } from 'next/headers';
-import { createServerClient } from '@supabase/ssr';
 import { getSupabaseAdmin } from '@/lib/supabaseAdmin';
 import { redirect } from 'next/navigation';
 
-// Helper: create a Supabase server client that reads session from cookies
-async function createSessionClient() {
-    const cookieStore = await cookies();
-    return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        {
-            cookies: {
-                getAll() {
-                    return cookieStore.getAll();
-                },
-                setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) =>
-                        cookieStore.set(name, value, options)
-                    );
-                },
-            },
-        }
-    );
-}
-
 // Helper: guard — must be admin session
 async function requireAdmin() {
-    const client = await createSessionClient();
-    const {
-        data: { user },
-    } = await client.auth.getUser();
-    if (!user) redirect('/admin/login');
-    return user;
+    // Supabase auth is completely disabled.
+    // Return a dummy user to let server actions proceed.
+    return { id: 'dummy-admin', email: 'admin@truckco.com' };
 }
 
-// ─── Admin Login ──────────────────────────────────────────────────────────────
+// ─── Admin Login (Disabled — Supabase auth removed) ──────────────────────────
 export async function adminLogin(
     email: string,
     password: string
 ): Promise<{ success: boolean; error?: string }> {
-    const client = await createSessionClient();
-    const { error } = await client.auth.signInWithPassword({ email, password });
-    if (error) return { success: false, error: error.message };
-    return { success: true };
+    return { success: false, error: 'Legacy login disabled. Use /admin directly.' };
 }
 
-// ─── Admin Logout ─────────────────────────────────────────────────────────────
+// ─── Admin Logout (Disabled — Supabase auth removed) ─────────────────────────
 export async function adminLogout() {
-    const client = await createSessionClient();
-    await client.auth.signOut();
-    redirect('/admin/login');
+    redirect('/');
 }
 
 // ─── Get All Applications ─────────────────────────────────────────────────────

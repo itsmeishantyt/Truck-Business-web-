@@ -4,6 +4,13 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false, // Security: Remove X-Powered-By
   reactStrictMode: true,
+
+  // Required for Hostinger Node.js deployment
+  // Bundles server into .next/standalone with all dependencies
+  output: "standalone",
+
+  // Native modules that must NOT be bundled by webpack
+  serverExternalPackages: ["better-sqlite3", "sharp"],
   async headers() {
     return [
       {

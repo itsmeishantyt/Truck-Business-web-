@@ -20,6 +20,20 @@
 # production
 /build
 
+# SQLite database (created at runtime on server)
+/data/*.db
+/data/*.db-wal
+/data/*.db-shm
+
+# Log files
+*.log
+build.log
+build_output.log
+build_output.txt
+err.txt
+tailwind-error.log
+typescript_errors*.txt
+
 # misc
 .DS_Store
 *.pem
